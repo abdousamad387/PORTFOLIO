@@ -1,0 +1,3023 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASF - Portfolio</title>
+    <!-- Empêche toute restauration de scroll par Chrome -->
+    <script>
+      history.scrollRestoration = 'manual';
+      if (location.hash) { history.replaceState(null, '', location.pathname + location.search); }
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+    <style>
+    /* =====================================================
+       TERRASIGHT, Slideshow, Modaux, Boutons
+       ===================================================== */
+
+    /* ── Badges au-dessus du strip ── */
+    .ts-top-badges {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 14px 8px; flex-wrap: wrap;
+    }
+
+    /* ── Strip miniatures ── */
+    .ts-thumb-strip {
+      position: relative; margin: 0 8px 6px;
+      border-radius: 10px; overflow: hidden;
+      background: rgba(0,0,0,0.35);
+    }
+    .ts-thumb-scroll {
+      display: flex; gap: 6px; padding: 6px;
+      overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none;
+    }
+    .ts-thumb-scroll::-webkit-scrollbar { display: none; }
+    .ts-thumb, .as-thumb, .af-thumb, .aa-thumb, .cv-thumb {
+      flex: 0 0 calc(25% - 5px); height: 150px;
+      object-fit: cover; border-radius: 8px; cursor: pointer;
+      opacity: 0.42; border: 2px solid transparent;
+      transition: opacity .3s, border-color .3s, transform .25s, box-shadow .25s;
+    }
+    .ts-thumb.active {
+      opacity: 1; border-color: #4ade80; transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(74,222,128,.45);
+    }
+    .ts-thumb:hover:not(.active),
+    .as-thumb:hover:not(.active),
+    .af-thumb:hover:not(.active),
+    .aa-thumb:hover:not(.active),
+    .cv-thumb:hover:not(.active) { opacity: .75; }
+    .ts-thumb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,.78); border: 1px solid rgba(74,222,128,.35);
+      color: #4ade80; width: 24px; height: 24px; border-radius: 50%;
+      font-size: 15px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      z-index: 5; transition: background .2s; line-height: 1; padding: 0;
+    }
+    .ts-thumb-nav:hover { background: rgba(74,222,128,.2); }
+    .ts-thumb-prev { left: 4px; } .ts-thumb-next { right: 4px; }
+
+    /* ── Bouton Test ── */
+    .proj-link--test {
+      background: linear-gradient(135deg,#4ade80,#22c55e) !important;
+      color: #021a06 !important; font-weight: 700; border: none !important;
+    }
+    .proj-link--test:hover { opacity: .88; transform: translateY(-1px); }
+
+    /* ── Overlay modal ── */
+    .ts-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.92);
+      z-index: 99999; display: flex; align-items: center;
+      justify-content: center; opacity: 0; pointer-events: none;
+      transition: opacity .3s ease; padding: 24px; box-sizing: border-box;
+    }
+    .ts-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── Conteneur modal ── */
+    .ts-modal {
+      background: #0d0d1a; border: 1px solid rgba(74,222,128,.18);
+      border-radius: 20px; width: 80vw; max-width: 80vw;
+      max-height: 88vh; overflow: hidden; display: flex;
+      flex-direction: column;
+      transform: scale(.94) translateY(24px);
+      transition: transform .35s cubic-bezier(.34,1.2,.64,1);
+      box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(74,222,128,.07);
+    }
+    .ts-modal-overlay.open .ts-modal { transform: scale(1) translateY(0); }
+
+    /* ── En-tête modal ── */
+    .ts-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px; border-bottom: 1px solid rgba(255,255,255,.07);
+      flex-shrink: 0; background: rgba(0,0,0,.2);
+    }
+    .ts-modal-title {
+      font-size: 16px; font-weight: 700; color: #4ade80;
+      letter-spacing: .6px; text-transform: uppercase;
+    }
+    .ts-modal-close {
+      background: none; border: 1px solid rgba(255,255,255,.12);
+      color: #71717a; width: 36px; height: 36px; border-radius: 10px;
+      cursor: pointer; font-size: 15px; display: flex;
+      align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0;
+    }
+    .ts-modal-close:hover { background: rgba(255,255,255,.09); color: #fff; border-color: rgba(255,255,255,.25); }
+
+    /* ── Carrousel doc ── */
+    .ts-carousel {
+      position: relative; height: 52vh;
+      background: #070712; flex-shrink: 0; overflow: hidden;
+    }
+    .ts-carousel-img,
+    .as-carousel-img,
+    .cv-carousel-img,
+    .aa-carousel-img,
+    .af-carousel-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: contain; padding: 14px;
+      opacity: 0; transition: opacity .55s ease;
+      cursor: zoom-in;
+    }
+    .ts-carousel-img.active,
+    .as-carousel-img.active,
+    .cv-carousel-img.active,
+    .aa-carousel-img.active,
+    .af-carousel-img.active { opacity: 1; }
+    .ts-carousel-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,.78); border: 2px solid rgba(74,222,128,.6);
+      color: #4ade80; width: 52px; height: 52px; border-radius: 50%;
+      cursor: pointer; font-size: 26px; display: flex;
+      align-items: center; justify-content: center;
+      z-index: 10; transition: background .2s, border-color .2s, transform .2s; line-height: 1; padding: 0;
+    }
+    .ts-carousel-btn:hover { background: rgba(74,222,128,.22); border-color: #4ade80; transform: translateY(-50%) scale(1.1); }
+    .ts-carousel-prev { left: 18px; } .ts-carousel-next { right: 18px; }
+    .ts-carousel-counter {
+      position: absolute; top: 12px; right: 16px;
+      background: rgba(0,0,0,.65); border: 1px solid rgba(74,222,128,.25);
+      color: #4ade80; font-size: 13px; font-weight: 700;
+      padding: 4px 12px; border-radius: 20px; z-index: 10;
+      letter-spacing: 1px;
+    }
+    .ts-carousel-dots {
+      position: absolute; bottom: 12px; left: 50%;
+      transform: translateX(-50%); display: flex; gap: 10px; z-index: 10;
+    }
+    .ts-carousel-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(255,255,255,.28); cursor: pointer;
+      transition: background .25s, transform .2s; border: none;
+    }
+    .ts-carousel-dot.active { background: #4ade80; transform: scale(1.4); }
+    .ts-carousel-caption {
+      position: absolute; bottom: 30px; left: 0; right: 0;
+      text-align: center; font-size: 12px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: rgba(255,255,255,.55); pointer-events: none;
+    }
+
+    /* ── Corps modal (README) ── */
+    .ts-modal-body {
+      overflow-y: auto; flex: 1;
+      scrollbar-width: thin; scrollbar-color: rgba(74,222,128,.2) transparent;
+    }
+    .ts-modal-body::-webkit-scrollbar { width: 6px; }
+    .ts-modal-body::-webkit-scrollbar-track { background: transparent; }
+    .ts-modal-body::-webkit-scrollbar-thumb { background: rgba(74,222,128,.25); border-radius: 3px; }
+    .ts-readme-content {
+      padding: 32px 42px; font-size: 17px; line-height: 1.85; color: #d0d0e0;
+    }
+    .ts-readme-loading {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 200px; color: #555; font-size: 16px;
+    }
+    .ts-readme-content h1 { font-size: 30px; color: #4ade80; margin: 0 0 22px; font-weight: 800; }
+    .ts-readme-content h2 { font-size: 23px; color: #86efac; margin: 34px 0 14px; padding-bottom: 9px; border-bottom: 1px solid rgba(74,222,128,.15); font-weight: 700; }
+    .ts-readme-content h3 { font-size: 20px; color: #a7f3d0; margin: 22px 0 10px; font-weight: 600; }
+    .ts-readme-content h4 { font-size: 17px; color: #d1fae5; margin: 16px 0 7px; font-weight: 600; }
+    .ts-readme-content p { margin: 0 0 13px; }
+    .ts-readme-content a { color: #4ade80; text-decoration: underline; text-decoration-color: rgba(74,222,128,.3); }
+    .ts-readme-content a:hover { color: #86efac; }
+    .ts-readme-content code { background: rgba(74,222,128,.1); color: #86efac; padding: 3px 8px; border-radius: 5px; font-size: 15px; }
+    .ts-readme-content pre { background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 18px 22px; overflow-x: auto; margin: 14px 0; }
+    .ts-readme-content pre code { background: none; padding: 0; color: #a4e8c4; font-size: 14px; }
+    .ts-readme-content blockquote { border-left: 4px solid #4ade80; margin: 14px 0; padding: 12px 20px; background: rgba(74,222,128,.05); border-radius: 0 10px 10px 0; color: #a8a8c0; font-size: 16px; }
+    .ts-readme-content table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
+    .ts-readme-content thead th { background: rgba(74,222,128,.1); color: #4ade80; padding: 11px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid rgba(74,222,128,.2); }
+    .ts-readme-content tbody td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .ts-readme-content tbody tr:last-child td { border-bottom: none; }
+    .ts-readme-content tbody tr:hover td { background: rgba(255,255,255,.025); }
+    .ts-readme-content ul, .ts-readme-content ol { padding-left: 26px; margin: 8px 0 14px; }
+    .ts-readme-content li { margin-bottom: 7px; }
+    .ts-readme-content strong { color: #eeeef8; }
+    .ts-readme-content hr { border: none; border-top: 1px solid rgba(255,255,255,.08); margin: 26px 0; }
+    .ts-readme-content img { max-width: 100%; border-radius: 10px; margin: 10px 0; }
+    .ts-readme-content p > img { display: block; max-width: 140px; margin: 6px auto; }
+
+    /* ── Vidéo ── */
+    .ts-video-container {
+      padding: 24px; display: flex; align-items: center;
+      justify-content: center; background: #000;
+    }
+    .ts-video-container video {
+      width: 100%; max-height: calc(88vh - 80px);
+      border-radius: 12px; outline: none;
+    }
+    </style>
+</head>
+<body>
+    <!-- Canvas fond animé global -->
+    <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+    <!-- Panneau latéral droit -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <span class="logo-infinity logo-infinity--left">&#8734;</span>
+                <div class="logo-asf-wrap">
+                    <!-- Orbites + étoiles -->
+                    <div class="logo-orbit logo-orbit--1">
+                        <span class="logo-orb-star" style="--c:#6c63ff;--d:0s">&#9733;</span>
+                    </div>
+                    <div class="logo-orbit logo-orbit--2">
+                        <span class="logo-orb-star" style="--c:#ffd700;--d:0.8s">&#10022;</span>
+                    </div>
+                    <div class="logo-orbit logo-orbit--3">
+                        <span class="logo-orb-star" style="--c:#a78bfa;--d:1.6s">&#9733;</span>
+                    </div>
+                    <div class="logo-orbit logo-orbit--4">
+                        <span class="logo-orb-star" style="--c:#22c55e;--d:2.4s">&#10022;</span>
+                    </div>
+                    <div class="logo-orbit logo-orbit--5">
+                        <span class="logo-orb-star" style="--c:#f472b6;--d:1.2s">&#9733;</span>
+                    </div>
+                    <div class="logo-orbit logo-orbit--6">
+                        <span class="logo-orb-star" style="--c:#38bdf8;--d:2s">&#10022;</span>
+                    </div>
+                    <!-- Texte ASF -->
+                    <span class="logo-text">ASF</span>
+                </div>
+                <span class="logo-infinity logo-infinity--right">&#8734;</span>
+            </div>
+
+            <!-- Bande passante -->
+            <div class="logo-marquee-wrap">
+                <div class="logo-marquee-track">
+                    <span class="logo-marquee-item">
+                        <span class="lm-dot" style="--c:#6c63ff">&#9679;</span>
+                        Full Stack WebGIS Developer
+                        <span class="lm-sep">&#10022;</span>
+                        Geo Data Science &amp; Analyst
+                        <span class="lm-dot" style="--c:#ffd700">&#9679;</span>
+                        Full Stack WebGIS Developer
+                        <span class="lm-sep">&#10022;</span>
+                        Geo Data Science &amp; Analyst
+                        <span class="lm-dot" style="--c:#a78bfa">&#9679;</span>
+                        Full Stack WebGIS Developer
+                        <span class="lm-sep">&#10022;</span>
+                        Geo Data Science &amp; Analyst
+                        <span class="lm-dot" style="--c:#22c55e">&#9679;</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- Bouton de langue -->
+        <div class="lang-toggle">
+            <button class="lang-toggle__btn lang-toggle__btn--active" data-lang="en">EN</button>
+            <span class="lang-toggle__sep">|</span>
+            <button class="lang-toggle__btn" data-lang="fr">FR</button>
+        </div>
+
+        <ul class="sidebar-nav">
+
+            <li class="nav-group-label" data-i18n="navg.home">Home</li>
+
+            <li><a href="javascript:void(0)" class="nav-link active" data-section="home">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+                <span class="nav-text" data-i18n="nav.home">Home</span>
+                <span class="nav-num">01</span>
+            </a></li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="about">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <span class="nav-text" data-i18n="nav.about">About</span>
+                <span class="nav-num">02</span>
+            </a></li>
+
+            <li class="nav-group-label" data-i18n="navg.expertise">Expertise</li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="skills">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                <span class="nav-text" data-i18n="nav.skills">Skills</span>
+                <span class="nav-num">03</span>
+            </a></li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="experience">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+                <span class="nav-text" data-i18n="nav.experience">Experience</span>
+                <span class="nav-num">04</span>
+            </a></li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="education">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                <span class="nav-text" data-i18n="nav.education">Education</span>
+                <span class="nav-num">05</span>
+            </a></li>
+
+            <li class="nav-group-label" data-i18n="navg.achievements">Achievements</li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="projets">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+                <span class="nav-text" data-i18n="nav.projects">Projects</span>
+                <span class="nav-num">06</span>
+            </a></li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="impact">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+                <span class="nav-text" data-i18n="nav.impact">Impact</span>
+                <span class="nav-num">07</span>
+            </a></li>
+
+            <li class="nav-group-label" data-i18n="navg.more">More</li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="blog">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
+                <span class="nav-text" data-i18n="nav.blog">Blog</span>
+                <span class="nav-num">08</span>
+            </a></li>
+
+            <li><a href="javascript:void(0)" class="nav-link" data-section="contact">
+                <span class="nav-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                <span class="nav-text" data-i18n="nav.contact">Contact</span>
+                <span class="nav-num">09</span>
+            </a></li>
+
+        </ul>
+        <div class="sidebar-footer">
+            <div class="sidebar-line"></div>
+            <p class="sidebar-copyright">
+                &copy; 2026 &mdash; <strong>Abdou Samad Faye</strong><br>
+                <span data-i18n="cp.rights">All rights reserved</span> &bull; <span data-i18n="cp.citizen">Citizen of the World</span><br>
+                <span class="sidebar-eco" data-i18n="cp.eco">🌍 Let's protect our planet</span>
+            </p>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main id="main-content" class="main-content">
+        <section id="home" class="section section-active">
+            <!-- Particules d'arrière-plan -->
+            <div class="hero-particles" id="heroParticles"></div>
+
+            <div class="section-inner hero-content">
+                <!-- Badge d'accroche -->
+                <div class="hero-badge animate-in" style="--delay: 0.2s">
+                    <span class="badge-dot"></span>
+                    <span data-i18n="hero.badge">World Bank Youth Summit 2025 Delegate</span>
+                </div>
+
+                <!-- Nom principal -->
+                <h1 class="hero-name animate-in" style="--delay: 0.4s">
+                    <span class="hero-greeting" data-i18n="hero.greeting">Hello, I am</span>
+                    <span class="hero-fullname">
+                        <span class="hero-firstname">ABDOU SAMAD</span>
+                        <span class="name-accent">FAYE</span>
+                    </span>
+                </h1>
+
+                <!-- Titre professionnel avec effet de typing -->
+                <div class="hero-roles animate-in" style="--delay: 0.6s">
+                    <span class="role-item">Geo-Data Scientist</span>
+                    <span class="role-separator">•</span>
+                    <span class="role-item">GIS &amp; WebGIS Engineer</span>
+                    <span class="role-separator">•</span>
+                    <span class="role-item">AI &amp; Remote Sensing</span>
+                </div>
+
+                <!-- Phrase d'impact -->
+                <p class="hero-tagline animate-in" style="--delay: 0.8s" data-i18n-html="hero.tagline">I turn <strong>25 years of NASA/ESA satellite data</strong> into intelligence systems that protect territories, anticipate crises, and drive development, anywhere on Earth.<br><span class="tagline-secondary">From <em>TERRASIGHT</em> to <em>AquaMind</em>, I build geospatial solutions that shape the world of tomorrow.</span></p>
+
+                <!-- Statistiques clés -->
+                <div class="hero-stats animate-in" style="--delay: 1s">
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="95.09">0</span><span class="stat-unit">%</span>
+                        <span class="stat-label" data-i18n="hero.stat.ml">ML Accuracy</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="3847">0</span><span class="stat-unit"> km²</span>
+                        <span class="stat-label" data-i18n="hero.stat.zones">Areas analyzed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="8">0</span><span class="stat-unit"> apps</span>
+                        <span class="stat-label" data-i18n="hero.stat.deployed">Deployed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" data-target="25">0</span><span class="stat-unit"> yrs</span>
+                        <span class="stat-label" data-i18n="hero.stat.satellite">Satellite data</span>
+                    </div>
+                </div>
+
+                <!-- Ligne signature -->
+                <div class="hero-signature animate-in" style="--delay: 1.4s">
+                    <span class="signature-line"></span>
+                    <span class="signature-text" data-i18n="hero.signature">Turning planetary data into decisions that matter.</span>
+                    <span class="signature-line"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- À PROPOS -->
+        <section id="about" class="section">
+            <div class="section-inner">
+                <div class="section-header animate-in" style="--delay: 0.2s">
+                    <span class="section-tag" data-i18n="about.tag">Who I am</span>
+                    <h2 class="section-title" data-i18n-html="about.title">About <span class="title-accent">Me</span></h2>
+                </div>
+
+                <div class="about-layout">
+                    <!-- Colonne gauche : storytelling -->
+                    <div class="about-story animate-in" style="--delay: 0.4s">
+                        <div class="about-quote">
+                            <span class="quote-mark">&#8220;</span>
+                            <p data-i18n="about.quote">Every satellite pixel carries a piece of our planet's story. My mission: decode it, so every territory, on every continent, can act with intelligence.</p>
+                        </div>
+
+                        <div class="about-text">
+                            <p class="about-paragraph about-lead" data-i18n-html="about.lead">Geospatial data speaks to those who know how to listen. I am <strong>Abdou Samad Faye</strong>, a Geo-Data Scientist bridging <em>25 years of planetary satellite archives</em> and the strategic decisions that reshape territories, across Africa, Europe, Asia, and beyond.</p>
+
+                            <p class="about-paragraph" data-i18n-html="about.p2">Where others see raw images, I decode land shifts, vegetation loss signals, climate-driven risks, and urban expansion patterns, converting them into <strong>alerts, decision maps, and WebGIS applications</strong> accessible to governments, researchers, and organizations worldwide. Africa was my proving ground. The planet is my canvas.</p>
+
+                            <p class="about-paragraph" data-i18n-html="about.p3">I master complex multi-sensor environments (Landsat, Sentinel, MODIS, GEDI LiDAR) and translate fragmented data into <strong>clear models, proven predictions, and measurable outcomes</strong>. <em>TERRASIGHT</em> achieved 95.09% ML accuracy. <em>AquaMind</em> forecasts floods with 92% reliability. These are not regional achievements, they are global-grade benchmarks.</p>
+
+                            <p class="about-paragraph" data-i18n-html="about.p4">My edge? Merging scientific rigor with the power of Machine Learning and the reach of WebGIS, so every analysis becomes a <strong>living, deployed tool</strong> that drives real decisions. Wherever data exists on this planet, I can turn it into value.</p>
+                        </div>
+                    </div>
+
+                    <!-- Colonne droite : highlights -->
+                    <div class="about-highlights animate-in" style="--delay: 0.6s">
+                        <div class="highlight-card">
+                            <div class="highlight-icon">&#127757;</div>
+                            <div class="highlight-content">
+                                <h4 data-i18n="about.h.vision">The vision</h4>
+                                <p data-i18n="about.d.vision">Build a new generation of planetary geospatial intelligence, making satellite data useful, actionable, and accessible to every decision-maker on Earth.</p>
+                            </div>
+                        </div>
+
+                        <div class="highlight-card">
+                            <div class="highlight-icon">&#128161;</div>
+                            <div class="highlight-content">
+                                <h4 data-i18n="about.h.passion">The passion</h4>
+                                <p data-i18n="about.d.passion">Every morning I wake up to decode the planet. Every pixel, every spectral band is a clue toward a better-informed world.</p>
+                            </div>
+                        </div>
+
+                        <div class="highlight-card">
+                            <div class="highlight-icon">&#128640;</div>
+                            <div class="highlight-content">
+                                <h4 data-i18n="about.h.ambition">The ambition</h4>
+                                <p data-i18n="about.d.ambition">From TERRASIGHT to AquaMind, each project sets a new global benchmark, and the next one reaches further, for more people, on more continents.</p>
+                            </div>
+                        </div>
+
+                        <div class="highlight-card">
+                            <div class="highlight-icon">&#9879;</div>
+                            <div class="highlight-content">
+                                <h4 data-i18n="about.h.method">The method</h4>
+                                <p data-i18n="about.d.method">Python, SQL, GEE, Random Forest, Deep Learning, WebGIS, a full-stack geospatial toolkit built to serve global impact.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section">
+            <div class="section-inner">
+                <div class="section-header animate-in" style="--delay: 0.2s">
+                    <span class="section-tag" data-i18n="skills.tag">Technical Arsenal</span>
+                    <h2 class="section-title" data-i18n-html="skills.title">Skills <span class="title-accent">&amp; Expertise</span></h2>
+                    <p class="section-desc" data-i18n="skills.desc">A full-stack geospatial ecosystem, from satellite acquisition to decision dashboard, deployable anywhere on Earth.</p>
+                </div>
+
+                <!-- Skill categories -->
+                <div class="skills-grid">
+
+                    <!-- 1. Remote Sensing & GEE -->
+                    <div class="skill-category animate-in" style="--delay: 0.3s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#128752;</span>
+                            <h3 class="skill-cat-title" data-i18n-html="skill.cat.remote">Remote Sensing &amp; GEE</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">Google Earth Engine</span>
+                            <span class="skill-tag skill-tag--expert">SNAP</span>
+                            <span class="skill-tag skill-tag--expert">ENVI</span>
+                            <span class="skill-tag skill-tag--advanced">MODIS</span>
+                            <span class="skill-tag skill-tag--advanced">GEDI LiDAR</span>
+                            <span class="skill-tag skill-tag--advanced">CHIRPS</span>
+                            <span class="skill-tag skill-tag--advanced">ERA5</span>
+                            <span class="skill-tag skill-tag--expert">NDVI / NDWI / LST</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="95" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. GIS & WebGIS -->
+                    <div class="skill-category animate-in" style="--delay: 0.4s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#127758;</span>
+                            <h3 class="skill-cat-title" data-i18n-html="skill.cat.gis">GIS &amp; WebGIS</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">QGIS</span>
+                            <span class="skill-tag skill-tag--expert">ArcGIS Pro</span>
+                            <span class="skill-tag skill-tag--expert">Leaflet.js</span>
+                            <span class="skill-tag skill-tag--advanced">OpenLayers</span>
+                            <span class="skill-tag skill-tag--advanced">MapBox</span>
+                            <span class="skill-tag skill-tag--expert">PostGIS</span>
+                            <span class="skill-tag skill-tag--advanced">SpatiaLite</span>
+                            <span class="skill-tag skill-tag--intermediate">OGC (WMS, WFS, WCS)</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="92" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Data Science & AI -->
+                    <div class="skill-category animate-in" style="--delay: 0.5s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#129302;</span>
+                            <h3 class="skill-cat-title" data-i18n-html="skill.cat.ds">Data Science &amp; AI</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">Random Forest</span>
+                            <span class="skill-tag skill-tag--expert">Gradient Boosting</span>
+                            <span class="skill-tag skill-tag--advanced">LSTM</span>
+                            <span class="skill-tag skill-tag--advanced">CNN</span>
+                            <span class="skill-tag skill-tag--advanced">GNN</span>
+                            <span class="skill-tag skill-tag--intermediate">Transformers</span>
+                            <span class="skill-tag skill-tag--expert">Scikit-learn</span>
+                            <span class="skill-tag skill-tag--advanced">TensorFlow / Keras</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="88" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Data Analysis & BI -->
+                    <div class="skill-category animate-in" style="--delay: 0.6s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#128202;</span>
+                            <h3 class="skill-cat-title">Data Analysis &amp; BI</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">Python (Pandas, NumPy)</span>
+                            <span class="skill-tag skill-tag--expert">GeoPandas / Rasterio</span>
+                            <span class="skill-tag skill-tag--advanced">R</span>
+                            <span class="skill-tag skill-tag--expert">SQL</span>
+                            <span class="skill-tag skill-tag--advanced">Power BI</span>
+                            <span class="skill-tag skill-tag--advanced">Tableau</span>
+                            <span class="skill-tag skill-tag--expert">Plotly / Dash</span>
+                            <span class="skill-tag skill-tag--advanced">Matplotlib / Seaborn</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="90" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Web Development -->
+                    <div class="skill-category animate-in" style="--delay: 0.7s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#128187;</span>
+                            <h3 class="skill-cat-title" data-i18n-html="skill.cat.web">Web Development</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">HTML5 / CSS3</span>
+                            <span class="skill-tag skill-tag--expert">JavaScript ES6+</span>
+                            <span class="skill-tag skill-tag--advanced">React</span>
+                            <span class="skill-tag skill-tag--intermediate">Flutter</span>
+                            <span class="skill-tag skill-tag--advanced">Flask / Django</span>
+                            <span class="skill-tag skill-tag--advanced">Node.js</span>
+                            <span class="skill-tag skill-tag--advanced">REST / GraphQL APIs</span>
+                            <span class="skill-tag skill-tag--expert">Git / GitHub</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="85" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Databases -->
+                    <div class="skill-category animate-in" style="--delay: 0.8s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#128451;</span>
+                            <h3 class="skill-cat-title" data-i18n-html="skill.cat.db2">Databases</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">PostgreSQL / PostGIS</span>
+                            <span class="skill-tag skill-tag--advanced">MySQL</span>
+                            <span class="skill-tag skill-tag--intermediate">MongoDB</span>
+                            <span class="skill-tag skill-tag--intermediate">Redis</span>
+                            <span class="skill-tag skill-tag--advanced">SpatiaLite</span>
+                            <span class="skill-tag skill-tag--advanced">MCD Conceptuel</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="82" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 7. IoT & Monitoring -->
+                    <div class="skill-category animate-in" style="--delay: 0.9s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#128225;</span>
+                            <h3 class="skill-cat-title">IoT &amp; Monitoring</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--advanced">Réseaux capteurs</span>
+                            <span class="skill-tag skill-tag--advanced">PM2.5 / NO2 / CO2</span>
+                            <span class="skill-tag skill-tag--advanced">Alertes temps réel</span>
+                            <span class="skill-tag skill-tag--advanced">Flux hydrologique</span>
+                            <span class="skill-tag skill-tag--intermediate">ODK / KoBoToolbox</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="78" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Outils & Soft Skills -->
+                    <div class="skill-category animate-in" style="--delay: 1s">
+                        <div class="skill-cat-header">
+                            <span class="skill-cat-icon">&#9879;</span>
+                            <h3 class="skill-cat-title" data-i18n-html="skill.cat.tools">Tools &amp; Soft Skills</h3>
+                        </div>
+                        <div class="skill-tags">
+                            <span class="skill-tag skill-tag--expert">LaTeX</span>
+                            <span class="skill-tag skill-tag--expert">Word / Excel / PPT</span>
+                            <span class="skill-tag skill-tag--intermediate">SAP (notions)</span>
+                            <span class="skill-tag skill-tag--advanced">ETL Airflow</span>
+                            <span class="skill-tag skill-tag--expert">Rédaction institutionnelle</span>
+                            <span class="skill-tag skill-tag--expert">Formation terrain</span>
+                        </div>
+                        <div class="skill-bar-container">
+                            <div class="skill-bar" data-level="88" data-label="Maîtrise"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Langues -->
+                <div class="skills-languages animate-in" style="--delay: 1.1s">
+                    <h3 class="awards-title" data-i18n="skills.lang.title">Languages</h3>
+                    <div class="languages-row">
+                        <div class="lang-card">
+                            <span class="lang-flag">&#127467;&#127479;</span>
+                            <span class="lang-name">Français</span>
+                            <span class="lang-level" data-i18n="lang.fr.level">Native language</span>
+                            <div class="lang-dots">
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                            </div>
+                        </div>
+                        <div class="lang-card">
+                            <span class="lang-flag">&#127468;&#127463;</span>
+                            <span class="lang-name">English</span>
+                            <span class="lang-level" data-i18n="lang.en.level">Advanced professional</span>
+                            <div class="lang-dots">
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot"></span>
+                            </div>
+                        </div>
+                        <div class="lang-card">
+                            <span class="lang-flag">&#127480;&#127475;</span>
+                            <span class="lang-name">Wolof</span>
+                            <span class="lang-level" data-i18n="lang.wo.level">Native language</span>
+                            <div class="lang-dots">
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                                <span class="lang-dot active"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="section">
+            <div class="section-inner">
+                <div class="section-header animate-in" style="--delay: 0.2s">
+                    <span class="section-tag" data-i18n="exp.tag">Professional Path</span>
+                    <h2 class="section-title" data-i18n-html="exp.title">Experience <span class="title-accent">&amp; Commitment</span></h2>
+                    <p class="section-desc" data-i18n="exp.desc">From crisis fieldwork to AI platforms, each mission sharpens a toolkit built for global-scale challenges.</p>
+                </div>
+
+                <!-- Experience Timeline -->
+                <div class="exp-timeline">
+
+                    <!-- 1. Sahel Geomatic -->
+                    <div class="exp-item animate-in" style="--delay: 0.3s">
+                        <div class="exp-side">
+                            <span class="exp-date" data-i18n="exp.1.date">Jan. - Dec. 2025</span>
+                            <span class="exp-type exp-type--pro" data-i18n="exp.1.type">Full-time</span>
+                        </div>
+                        <div class="exp-dot-col">
+                            <div class="exp-dot"></div>
+                            <div class="exp-line"></div>
+                        </div>
+                        <div class="exp-card">
+                            <div class="exp-card-header">
+                                <h3 class="exp-role">Data Science &amp; WebSIG Specialist</h3>
+                                <div class="exp-company">
+                                    <span class="exp-company-icon">&#127970;</span>
+                                    <span>Sahel Geomatic, Dakar, Sénégal</span>
+                                </div>
+                            </div>
+                            <ul class="exp-tasks">
+                                <li data-i18n="exp.1.t1">Production of operational WebGIS products for governments and development partners in West Africa</li>
+                                <li data-i18n="exp.1.t2">Transformation of complex geospatial data into decision-making indicators: thematic maps, accessibility analyses, and dashboards</li>
+                                <li data-i18n="exp.1.t3">Applied ML models: automated satellite feature extraction, spatial predictive analytics, real-time dashboards</li>
+                                <li data-i18n="exp.1.t4">Coordination with field teams for validation and integration of collected data</li>
+                            </ul>
+                            <div class="exp-stack">
+                                <span class="exp-stack-tag">Python</span>
+                                <span class="exp-stack-tag">GEE</span>
+                                <span class="exp-stack-tag">ArcGIS</span>
+                                <span class="exp-stack-tag">Leaflet.js</span>
+                                <span class="exp-stack-tag">ML</span>
+                                <span class="exp-stack-tag">PostGIS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. ASEDGE -->
+                    <div class="exp-item animate-in" style="--delay: 0.4s">
+                        <div class="exp-side">
+                            <span class="exp-date" data-i18n="exp.2.date">2024, Present</span>
+                            <span class="exp-type exp-type--founder" data-i18n="exp.2.type">Founder</span>
+                        </div>
+                        <div class="exp-dot-col">
+                            <div class="exp-dot exp-dot--active">
+                                <span class="exp-dot-ring"></span>
+                            </div>
+                            <div class="exp-line"></div>
+                        </div>
+                        <div class="exp-card exp-card--highlight">
+                            <div class="exp-card-header">
+                                <h3 class="exp-role">Fondateur &amp; CEO</h3>
+                                <div class="exp-company">
+                                    <span class="exp-company-icon">&#128640;</span>
+                                    <span>ASEDGE, Diamniadio, Sénégal</span>
+                                </div>
+                                <p class="exp-subtitle">Abdou Samad Entreprise for Development, Growth &amp; Excellence</p>
+                            </div>
+                            <ul class="exp-tasks">
+                                <li data-i18n="exp.2.t1">Leading a geospatial and AI solutions structure for sustainable development in West Africa</li>
+                                <li data-i18n-html="exp.2.t2">Delivery of <strong>8 public geospatial applications</strong> covering environment, agriculture, health, urban planning, and finance</li>
+                                <li data-i18n="exp.2.t3">Multi-project management, institutional partnerships (CSE Senegal, OMVS), international applications (UNEP, World Bank, ADB)</li>
+                                <li data-i18n="exp.2.t4">Capacity building and training on GIS tools and remote sensing</li>
+                            </ul>
+                            <div class="exp-stack">
+                                <span class="exp-stack-tag">Leadership</span>
+                                <span class="exp-stack-tag">IA</span>
+                                <span class="exp-stack-tag">WebGIS</span>
+                                <span class="exp-stack-tag">Télédétection</span>
+                                <span class="exp-stack-tag">GEE</span>
+                                <span class="exp-stack-tag">Partenariats</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Focus Zero Inondation / Mairie Touba -->
+                    <div class="exp-item animate-in" style="--delay: 0.5s">
+                        <div class="exp-side">
+                            <span class="exp-date" data-i18n="exp.3.date">Aug. - Sep. 2025</span>
+                            <span class="exp-type exp-type--volunteer" data-i18n="exp.3.type">Volunteer</span>
+                        </div>
+                        <div class="exp-dot-col">
+                            <div class="exp-dot"></div>
+                            <div class="exp-line"></div>
+                        </div>
+                        <div class="exp-card exp-card--mission">
+                            <div class="exp-card-header">
+                                <h3 class="exp-role" data-i18n-html="exp.3.role">Cartographer &amp; Field Coordinator</h3>
+                                <div class="exp-company">
+                                    <span class="exp-company-icon">&#127759;</span>
+                                    <span>ONG Focus Zero Inondation × Mairie de Touba, Sénégal</span>
+                                </div>
+                            </div>
+                            <ul class="exp-tasks">
+                                <li data-i18n-html="exp.3.t1"><strong>Coordination of a team of ~10 people</strong> in the field during a real crisis (floods)</li>
+                                <li data-i18n="exp.3.t2">Participatory mapping of flood zones, field data collection with local communities</li>
+                                <li data-i18n-html="exp.3.t3">Deployment of monitoring tools: <strong>KoBoToolbox + GPS + MerginMaps + ArcGIS Pro</strong></li>
+                                <li data-i18n="exp.3.t4">Concrete deliverables: vulnerability maps, field reports, georeferenced data</li>
+                                <li data-i18n-html="exp.3.t5">Final WebGIS with <strong>vulnerability and flood exposure dashboards</strong></li>
+                            </ul>
+                            <div class="exp-stack">
+                                <span class="exp-stack-tag">KoBoToolbox</span>
+                                <span class="exp-stack-tag">MerginMaps</span>
+                                <span class="exp-stack-tag">ArcGIS Pro</span>
+                                <span class="exp-stack-tag">GPS</span>
+                                <span class="exp-stack-tag">WebGIS</span>
+                                <span class="exp-stack-tag">Terrain</span>
+                            </div>
+                            <div class="exp-impact-badge">
+                                <span>&#9889;</span> <span data-i18n="exp.3.impact">High-impact humanitarian field mission</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. AGIS GROUP -->
+                    <div class="exp-item animate-in" style="--delay: 0.6s">
+                        <div class="exp-side">
+                            <span class="exp-date" data-i18n="exp.4.date">Aug. - Nov. 2024</span>
+                            <span class="exp-type exp-type--stage" data-i18n="exp.4.type">Internship</span>
+                        </div>
+                        <div class="exp-dot-col">
+                            <div class="exp-dot"></div>
+                            <div class="exp-line"></div>
+                        </div>
+                        <div class="exp-card">
+                            <div class="exp-card-header">
+                                <h3 class="exp-role" data-i18n-html="exp.4.role">Geomatics &amp; Environment Intern</h3>
+                                <div class="exp-company">
+                                    <span class="exp-company-icon">&#127970;</span>
+                                    <span>AGIS GROUP, Dakar, Sénégal</span>
+                                </div>
+                            </div>
+                            <ul class="exp-tasks">
+                                <li data-i18n="exp.4.t1">Geospatial analysis and digital mapping of study areas in West Africa</li>
+                                <li data-i18n="exp.4.t2">Sensor data processing, geographic database management, local COD creation</li>
+                                <li data-i18n="exp.4.t3">Production of operational maps and cartographic reports for institutional clients</li>
+                                <li data-i18n="exp.4.t4">Training and technical support to teams on GIS software (QGIS, ArcGIS)</li>
+                            </ul>
+                            <div class="exp-stack">
+                                <span class="exp-stack-tag">QGIS</span>
+                                <span class="exp-stack-tag">ArcGIS</span>
+                                <span class="exp-stack-tag">PostGIS</span>
+                                <span class="exp-stack-tag">Cartographie</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Engagement Humanitaire -->
+                <div class="exp-engagement animate-in" style="--delay: 0.7s">
+                    <h3 class="exp-engagement-title">
+                        <span class="exp-engagement-icon">&#129309;</span>
+                        <span data-i18n-html="exp.eng.title">Humanitarian &amp; Community Commitment</span>
+                    </h3>
+                    <div class="exp-engagement-grid">
+                        <div class="exp-engage-card">
+                            <div class="exp-engage-role" data-i18n="exp.eng.1.role">External Affairs Officer</div>
+                            <div class="exp-engage-org" data-i18n="exp.eng.1.org">Humanitarian Club, UCAD</div>
+                            <p class="exp-engage-desc" data-i18n="exp.eng.1.desc">Coordination with humanitarian organizations, external representation, dissemination of results</p>
+                        </div>
+                        <div class="exp-engage-card">
+                            <div class="exp-engage-role" data-i18n="exp.eng.2.role">Volunteer</div>
+                            <div class="exp-engage-org" data-i18n="exp.eng.2.org">NGO Village Pilote, 2020–2022</div>
+                            <p class="exp-engage-desc" data-i18n="exp.eng.2.desc">Community field support, awareness of local populations</p>
+                        </div>
+                        <div class="exp-engage-card">
+                            <div class="exp-engage-role" data-i18n="exp.eng.3.role">Environment Manager</div>
+                            <div class="exp-engage-org" data-i18n="exp.eng.3.org">Geosciences Club, UAM</div>
+                            <p class="exp-engage-desc" data-i18n="exp.eng.3.desc">Scientific outreach and GIS/remote sensing knowledge transfer to peers</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="education" class="section">
+            <div class="section-inner">
+                <div class="section-header animate-in" style="--delay: 0.2s">
+                    <span class="section-tag" data-i18n="edu.tag">Academic Path</span>
+                    <h2 class="section-title" data-i18n-html="edu.title">Education <span class="title-accent">&amp; Training</span></h2>
+                    <p class="section-desc" data-i18n="edu.desc">A path forged between fundamental sciences, geomatics, and artificial intelligence.</p>
+                </div>
+
+                <!-- Timeline -->
+                <div class="edu-timeline">
+
+                    <!-- 1. Master Géomatique -->
+                    <div class="edu-item animate-in" style="--delay: 0.3s">
+                        <div class="edu-timeline-dot">
+                            <span class="edu-dot-pulse"></span>
+                        </div>
+                        <div class="edu-card edu-card--current">
+                            <div class="edu-date">
+                                <span class="edu-year">2025 - 2026</span>
+                                <span class="edu-status edu-status--current" data-i18n="edu.status.current">In progress</span>
+                            </div>
+                            <h3 class="edu-degree" data-i18n-html="edu.2.degree">Master in Geomatics and Spatial Analysis</h3>
+                            <div class="edu-school">
+                                <span class="edu-school-icon">&#127979;</span>
+                                <span>UAM / École Polytechnique de Diamniadio</span>
+                            </div>
+                            <p class="edu-detail" data-i18n="edu.2.detail">Department of Applied Geosciences and Environment, Remote Sensing, Spatial Data Science, AI, Spatial Analysis</p>
+                            <div class="edu-thesis">
+                                <span class="edu-thesis-icon">&#128214;</span>
+                                <span data-i18n-html="edu.2.thesis">Thesis: <em>Urban expansion Greater Dakar 2000–2025</em>, invited co-publication in VertigO journal (Supervisor: Prof. Bocar SY)</span>
+                            </div>
+                            <div class="edu-tags">
+                                <span class="edu-tag">Télédétection</span>
+                                <span class="edu-tag">Data Science Spatiale</span>
+                                <span class="edu-tag">IA</span>
+                                <span class="edu-tag">SIG</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Licence Pro -->
+                    <div class="edu-item animate-in" style="--delay: 0.5s">
+                        <div class="edu-timeline-dot"></div>
+                        <div class="edu-card">
+                            <div class="edu-date">
+                                <span class="edu-year">2024 - 2025</span>
+                                <span class="edu-status edu-status--done" data-i18n="edu.status.done">Obtained</span>
+                            </div>
+                            <h3 class="edu-degree" data-i18n-html="edu.3.degree">Professional Bachelor in Applied Geo-informatics</h3>
+                            <div class="edu-school">
+                                <span class="edu-school-icon">&#127979;</span>
+                                <span>Université Amadou Mahtar Mbow (UAM), Sénégal</span>
+                            </div>
+                            <div class="edu-tags">
+                                <span class="edu-tag">Géo-informatique</span>
+                                <span class="edu-tag">SIG</span>
+                                <span class="edu-tag">Cartographie</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Classes Prépas -->
+                    <div class="edu-item animate-in" style="--delay: 0.6s">
+                        <div class="edu-timeline-dot"></div>
+                        <div class="edu-card">
+                            <div class="edu-date">
+                                <span class="edu-year">2021 - 2023</span>
+                                <span class="edu-status edu-status--done" data-i18n="edu.status.done">Obtained</span>
+                            </div>
+                            <h3 class="edu-degree" data-i18n-html="edu.4.degree">Preparatory Classes, Math · Physics · Engineering Sciences</h3>
+                            <div class="edu-school">
+                                <span class="edu-school-icon">&#127979;</span>
+                                <span>École Polytechnique de Diamniadio</span>
+                            </div>
+                            <div class="edu-tags">
+                                <span class="edu-tag">Mathématiques</span>
+                                <span class="edu-tag">Physique</span>
+                                <span class="edu-tag">Sciences Ingénieur</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Baccalauréat -->
+                    <div class="edu-item animate-in" style="--delay: 0.7s">
+                        <div class="edu-timeline-dot"></div>
+                        <div class="edu-card">
+                            <div class="edu-date">
+                                <span class="edu-year">2021</span>
+                                <span class="edu-status edu-status--done" data-i18n="edu.status.done">Obtained</span>
+                            </div>
+                            <h3 class="edu-degree" data-i18n="edu.5.degree">Scientific Baccalaureate S2</h3>
+                            <div class="edu-school">
+                                <span class="edu-school-icon">&#127979;</span>
+                                <span>Lycée Guéoul, Sénégal</span>
+                            </div>
+                            <div class="edu-tags">
+                                <span class="edu-tag">Sciences</span>
+                                <span class="edu-tag">Expérimentales</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="projets" class="section">
+            <div class="section-inner">
+                <div class="section-header animate-in" style="--delay: 0.2s">
+                    <span class="section-tag" data-i18n="proj.tag">What I build</span>
+                    <h2 class="section-title" data-i18n-html="proj.title">Projects <span class="title-accent">&amp; Work</span></h2>
+                    <p class="section-desc" data-i18n="proj.desc">From environmental intelligence to predictive systems, each project solves a real problem, at any scale, anywhere.</p>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="proj-tabs animate-in" style="--delay: 0.3s">
+                    <button class="proj-tab proj-tab--active" data-category="all">
+                        <span class="proj-tab-icon">&#128196;</span>
+                        <span data-i18n="proj.tab.all">All</span>
+                        <span class="proj-tab-count">7</span>
+                    </button>
+                    <button class="proj-tab" data-category="data-science">
+                        <span class="proj-tab-icon">&#129504;</span>
+                        <span>Data Science &amp; Geospatial</span>
+                        <span class="proj-tab-count">2</span>
+                    </button>
+                    <button class="proj-tab" data-category="webgis">
+                        <span class="proj-tab-icon">&#128421;</span>
+                        <span>WebGIS Tools</span>
+                        <span class="proj-tab-count">2</span>
+                    </button>
+                    <button class="proj-tab" data-category="data-analyst">
+                        <span class="proj-tab-icon">&#128202;</span>
+                        <span>Data Analyst</span>
+                        <span class="proj-tab-count">2</span>
+                    </button>
+                    <button class="proj-tab" data-category="spatial-analysis">
+                        <span class="proj-tab-icon">&#127758;</span>
+                        <span>Spatial Analysis</span>
+                        <span class="proj-tab-count">1</span>
+                    </button>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="proj-grid">
+
+                    <!-- ==================== DATA SCIENCE & GEOSPATIAL ==================== -->
+
+                    <!-- TERRASIGHT -->
+                    <div class="proj-card proj-card--featured animate-in" style="--delay: 0.4s" data-category="data-science">
+                        <div class="proj-card-top">
+                            <div class="ts-top-badges">
+                                <div class="proj-category-badge proj-badge--science">Data Science &amp; Geospatial</div>
+                                <div class="proj-featured-tag" data-i18n="proj.featured">&#11088; Featured project</div>
+                            </div>
+                            <!-- Bande de miniatures auto-défilantes -->
+                            <div class="ts-thumb-strip">
+                                <div class="ts-thumb-scroll" id="ts-thumb-scroll">
+                                    <img class="ts-thumb active" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/agriculture%20et%20farm.png" alt="Agriculture &amp; Farm" onclick="tsSetThumb(0)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/biophisical.png" alt="Biophysique" onclick="tsSetThumb(1)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/DSS%20SCORE%202024.png" alt="DSS Score 2024" onclick="tsSetThumb(2)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/GEDI%20LIDAR.png" alt="GEDI LiDAR" onclick="tsSetThumb(3)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/LST.png" alt="LST" onclick="tsSetThumb(4)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/NDVI.png" alt="NDVI" onclick="tsSetThumb(5)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/Profil.png" alt="Profil" onclick="tsSetThumb(6)">
+                                    <img class="ts-thumb" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/Random%20forest%20projection%202026_2040.png" alt="RF Projection" onclick="tsSetThumb(7)">
+                                </div>
+                                <button class="ts-thumb-nav ts-thumb-prev" onclick="tsPrevThumb()" type="button" aria-label="Précédent">&#8249;</button>
+                                <button class="ts-thumb-nav ts-thumb-next" onclick="tsNextThumb()" type="button" aria-label="Suivant">&#8250;</button>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">TERRASIGHT</h3>
+                            <p class="proj-subtitle">Plateforme IA &amp; Télédétection, Google Earth Engine</p>
+                            <p class="proj-desc">7 modules analytiques, 25 ans de données Landsat/Sentinel-2/MODIS/GEDI/CHIRPS. Précision RF 95,09% (Kappa=0,885). Détection de 2 631 km² de dégradation végétale. Recommandation officielle CSE Sénégal. Candidat PNUE Champions de la Terre 2026.</p>
+                            <div class="proj-metrics">
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">95.09%</span>
+                                    <span class="proj-metric-label">Précision</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">2 631 km²</span>
+                                    <span class="proj-metric-label">Analysés</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">7</span>
+                                    <span class="proj-metric-label">Modules</span>
+                                </div>
+                            </div>
+                            <div class="proj-stack">
+                                <span class="proj-tech">GEE</span>
+                                <span class="proj-tech">Python</span>
+                                <span class="proj-tech">Random Forest</span>
+                                <span class="proj-tech">Sentinel-2</span>
+                                <span class="proj-tech">MODIS</span>
+                                <span class="proj-tech">LiDAR GEDI</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="javascript:void(0)" class="proj-link proj-link--doc" onclick="tsOpenDocModal();">
+                                <span>&#128214;</span> Doc
+                            </a>
+                            <a href="javascript:void(0)" class="proj-link proj-link--demo" onclick="tsOpenDemoModal();">
+                                <span>&#9654;</span> D&eacute;mo
+                            </a>
+                            <a href="https://asfbigboss2001.users.earthengine.app/view/terrasight" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--test">
+                                <span>&#128640;</span> Tester
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Prédiction Décrochage -->
+                    <div class="proj-card animate-in" style="--delay: 0.5s" data-category="data-science">
+                        <div class="proj-card-top">
+                            <div class="proj-category-badge proj-badge--science">Data Science &amp; Geospatial</div>
+                            <div class="proj-card-visual proj-visual--science">
+                                <span class="proj-visual-icon">&#127891;</span>
+                                <div class="proj-visual-grid">
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">Prédiction Décrochage Étudiants</h3>
+                            <p class="proj-desc">Modèle prédictif de décrochage scolaire basé sur le Machine Learning, identification précoce des étudiants à risque pour des interventions ciblées.</p>
+                            <div class="proj-stack">
+                                <span class="proj-tech">Python</span>
+                                <span class="proj-tech">Scikit-learn</span>
+                                <span class="proj-tech">ML</span>
+                                <span class="proj-tech">Data Science</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="PROJETS/Data%20Science%20%26%20Geospatial/decrochage%20des%20etudiants/prediction_decrochage_des%20etudiants_ASF_2025.pdf" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--doc">
+                                <span>&#128196;</span> Rapport PDF
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ==================== WEBGIS TOOLS ==================== -->
+
+                    <!-- AIRSEN -->
+                    <div class="proj-card proj-card--featured animate-in" style="--delay: 0.6s" data-category="webgis">
+                        <div class="proj-card-top">
+                            <div class="ts-top-badges">
+                                <div class="proj-category-badge proj-badge--webgis">WebGIS Tools</div>
+                                <div class="proj-featured-tag">&#127942; 1er Prix Hackathon</div>
+                            </div>
+                            <!-- Bande de miniatures auto-défilantes -->
+                            <div class="ts-thumb-strip">
+                                <div class="ts-thumb-scroll" id="as-thumb-scroll">
+                                    <img class="as-thumb active" src="PROJETS/WebGIS%20Tools/AIRSEN/Documentation/profil%20airsen.png" alt="Profil AIRSEN" onclick="asSetThumb(0)">
+                                    <img class="as-thumb" src="PROJETS/WebGIS%20Tools/AIRSEN/Documentation/spatial%20autocorrolation.png" alt="Autocorr&eacute;lation Spatiale" onclick="asSetThumb(1)">
+                                    <img class="as-thumb" src="PROJETS/WebGIS%20Tools/AIRSEN/Documentation/statistiques%20par%20ecoles.png" alt="Statistiques par &Eacute;coles" onclick="asSetThumb(2)">
+                                </div>
+                                <button class="ts-thumb-nav ts-thumb-prev" onclick="asPrevThumb()" type="button" aria-label="Pr&eacute;c&eacute;dent">&#8249;</button>
+                                <button class="ts-thumb-nav ts-thumb-next" onclick="asNextThumb()" type="button" aria-label="Suivant">&#8250;</button>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">AIRSEN</h3>
+                            <p class="proj-subtitle">R&eacute;seau IoT &amp; WebGIS &mdash; Qualit&eacute; de l&rsquo;Air</p>
+                            <p class="proj-desc">PM2.5, NO2, CO2 &mdash; 1&nbsp;066 &eacute;coles, 14 r&eacute;gions, 2&nbsp;700 mesures (2020&ndash;2024). 92,7&nbsp;% des &eacute;coles au-dessus du seuil OMS. Alertes g&eacute;olocalis&eacute;es. 1er Prix Hackathon KAIKAI'DEV (45 &eacute;quipes).</p>
+                            <div class="proj-metrics">
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">1 066</span>
+                                    <span class="proj-metric-label">&Eacute;coles</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">92.7&nbsp;%</span>
+                                    <span class="proj-metric-label">D&eacute;passement OMS</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">7</span>
+                                    <span class="proj-metric-label">Polluants</span>
+                                </div>
+                            </div>
+                            <div class="proj-stack">
+                                <span class="proj-tech">Leaflet.js</span>
+                                <span class="proj-tech">IoT</span>
+                                <span class="proj-tech">Moran&rsquo;s I</span>
+                                <span class="proj-tech">KDE</span>
+                                <span class="proj-tech">Dashboard</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="javascript:void(0)" class="proj-link proj-link--doc" onclick="asOpenDocModal();">
+                                <span>&#128214;</span> Doc
+                            </a>
+                            <a href="javascript:void(0)" class="proj-link proj-link--demo" onclick="asOpenDemoModal();">
+                                <span>&#9654;</span> D&eacute;mo
+                            </a>
+                            <a href="https://abdousamad387.github.io/AIRSEN/" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--test">
+                                <span>&#128640;</span> Tester
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Africa Finance WebGIS -->
+                    <div class="proj-card proj-card--featured animate-in" style="--delay: 0.7s" data-category="webgis">
+                        <div class="proj-card-top">
+                            <div class="ts-top-badges">
+                                <div class="proj-category-badge proj-badge--webgis">WebGIS Tools</div>
+                                <div class="proj-featured-tag">&#128176; Observatoire Financier</div>
+                            </div>
+                            <!-- Bande de miniatures auto-défilantes -->
+                            <div class="ts-thumb-strip">
+                                <div class="ts-thumb-scroll" id="af-thumb-scroll">
+                                    <img class="af-thumb active" src="PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/Documentation/profil.png" alt="Profil" onclick="afSetThumb(0)">
+                                    <img class="af-thumb" src="PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/Documentation/Thematic%20indicator.png" alt="Indicateur Th&eacute;matique" onclick="afSetThumb(1)">
+                                    <img class="af-thumb" src="PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/Documentation/Attribute%20table.png" alt="Table d&rsquo;Attributs" onclick="afSetThumb(2)">
+                                </div>
+                                <button class="ts-thumb-nav ts-thumb-prev" onclick="afPrevThumb()" type="button" aria-label="Pr&eacute;c&eacute;dent">&#8249;</button>
+                                <button class="ts-thumb-nav ts-thumb-next" onclick="afNextThumb()" type="button" aria-label="Suivant">&#8250;</button>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">Africa Finance WebGIS</h3>
+                            <p class="proj-subtitle">Observatoire G&eacute;ospatial Financier &mdash; 54 Pays 2000&ndash;2024</p>
+                            <p class="proj-desc">16 indicateurs &middot; 1&nbsp;325 enregistrements pays/an. Choropleth, cercles proportionnels, heatmap, animation temporelle, requ&ecirc;tes spatiales. Interface bilingue EN/FR. Stack Leaflet &middot; Chart.js &middot; Turf.js.</p>
+                            <div class="proj-metrics">
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">54</span>
+                                    <span class="proj-metric-label">Pays</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">25 ans</span>
+                                    <span class="proj-metric-label">S&eacute;ries</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">16</span>
+                                    <span class="proj-metric-label">Indicateurs</span>
+                                </div>
+                            </div>
+                            <div class="proj-stack">
+                                <span class="proj-tech">Leaflet.js</span>
+                                <span class="proj-tech">Chart.js</span>
+                                <span class="proj-tech">Turf.js</span>
+                                <span class="proj-tech">Python ETL</span>
+                                <span class="proj-tech">GeoJSON</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="javascript:void(0)" class="proj-link proj-link--doc" onclick="afOpenDocModal();">
+                                <span>&#128214;</span> Doc
+                            </a>
+                            <a href="javascript:void(0)" class="proj-link proj-link--demo" onclick="afOpenDemoModal();">
+                                <span>&#9654;</span> D&eacute;mo
+                            </a>
+                            <a href="https://abdousamad387.github.io/WEBGIS_AFRICA_FINANCE/" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--test">
+                                <span>&#128640;</span> Tester
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ==================== DATA ANALYST ==================== -->
+
+                    <!-- AGRI Africa -->
+                    <div class="proj-card proj-card--featured animate-in" style="--delay: 0.8s" data-category="data-analyst">
+                        <div class="proj-card-top">
+                            <div class="ts-top-badges">
+                                <div class="proj-category-badge proj-badge--analyst">Data Analyst</div>
+                                <div class="proj-featured-tag">&#127806; Base de Donn&eacute;es Agricole</div>
+                            </div>
+                            <!-- Bande de miniatures auto-défilantes -->
+                            <div class="ts-thumb-strip">
+                                <div class="ts-thumb-scroll" id="aa-thumb-scroll">
+                                    <img class="aa-thumb active" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/profil.png" alt="Profil" onclick="aaSetThumb(0)">
+                                    <img class="aa-thumb" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/agriculture%20production.png" alt="Production Agricole" onclick="aaSetThumb(1)">
+                                    <img class="aa-thumb" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/climate.png" alt="Climat" onclick="aaSetThumb(2)">
+                                    <img class="aa-thumb" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/indices.png" alt="Indices" onclick="aaSetThumb(3)">
+                                </div>
+                                <button class="ts-thumb-nav ts-thumb-prev" onclick="aaPrevThumb()" type="button" aria-label="Pr&eacute;c&eacute;dent">&#8249;</button>
+                                <button class="ts-thumb-nav ts-thumb-next" onclick="aaNextThumb()" type="button" aria-label="Suivant">&#8250;</button>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">AGRI Africa Database</h3>
+                            <p class="proj-subtitle">Dashboard Agricole Interactif &mdash; Afrique 2000&ndash;2024</p>
+                            <p class="proj-desc">54 pays africains &middot; 25 ans de donn&eacute;es FAO. Production c&eacute;r&eacute;ali&egrave;re, rendements, superficies, indices climatiques. Cartographie WebGIS Leaflet, r&eacute;gressions, corr&eacute;lations, ANOVA. Interface bilingue EN/FR.</p>
+                            <div class="proj-metrics">
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">54</span>
+                                    <span class="proj-metric-label">Pays</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">25 ans</span>
+                                    <span class="proj-metric-label">Donn&eacute;es FAO</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">WebGIS</span>
+                                    <span class="proj-metric-label">Carto interactive</span>
+                                </div>
+                            </div>
+                            <div class="proj-stack">
+                                <span class="proj-tech">React/TS</span>
+                                <span class="proj-tech">Leaflet</span>
+                                <span class="proj-tech">Python</span>
+                                <span class="proj-tech">Pandas</span>
+                                <span class="proj-tech">Plotly</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="javascript:void(0)" class="proj-link proj-link--doc" onclick="aaOpenDocModal();">
+                                <span>&#128214;</span> Doc
+                            </a>
+                            <a href="javascript:void(0)" class="proj-link proj-link--demo" onclick="aaOpenDemoModal();">
+                                <span>&#9654;</span> D&eacute;mo
+                            </a>
+                            <a href="https://abdousamad387.github.io/AGRI_AFRICA_DATABASE/" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--test">
+                                <span>&#128640;</span> Tester
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- COVID-19 -->
+                    <div class="proj-card proj-card--featured animate-in" style="--delay: 0.9s" data-category="data-analyst">
+                        <div class="proj-card-top">
+                            <div class="ts-top-badges">
+                                <div class="proj-category-badge proj-badge--analyst">Data Analyst</div>
+                                <div class="proj-featured-tag">&#127775; Dashboard Bilingue</div>
+                            </div>
+                            <!-- Bande de miniatures auto-défilantes -->
+                            <div class="ts-thumb-strip">
+                                <div class="ts-thumb-scroll" id="cv-thumb-scroll">
+                                    <img class="cv-thumb active" src="PROJETS/Data%20Analyst/COVID_19/Documentation/profil.png" alt="Profil" onclick="cvSetThumb(0)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Timeline%20epidemiologique.png" alt="Timeline &Eacute;pid&eacute;miologique" onclick="cvSetThumb(1)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Advanced%20statistics.png" alt="Advanced Statistics" onclick="cvSetThumb(2)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Distribution%20hierarchique%20des%20cas.png" alt="Distribution Hi&eacute;rarchique" onclick="cvSetThumb(3)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Individual%20chloropetre%20maps.png" alt="Cartes Choropl&egrave;thes" onclick="cvSetThumb(4)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/interactive%20charts.png" alt="Charts Interactifs" onclick="cvSetThumb(5)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Distribution%20de%20la%20croissance%20Pib%20en%202020.png" alt="Croissance PIB 2020" onclick="cvSetThumb(6)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/pib%20par%20hbt%20vs%20cfr.png" alt="PIB/hbt vs CFR" onclick="cvSetThumb(7)">
+                                    <img class="cv-thumb" src="PROJETS/Data%20Analyst/COVID_19/Documentation/treemap%20des%20cas%20par%20regions.png" alt="Treemap par R&eacute;gions" onclick="cvSetThumb(8)">
+                                </div>
+                                <button class="ts-thumb-nav ts-thumb-prev" onclick="cvPrevThumb()" type="button" aria-label="Pr&eacute;c&eacute;dent">&#8249;</button>
+                                <button class="ts-thumb-nav ts-thumb-next" onclick="cvNextThumb()" type="button" aria-label="Suivant">&#8250;</button>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">COVID-19 Africa Dashboard</h3>
+                            <p class="proj-subtitle">Dashboard &Eacute;pid&eacute;miologique Interactif &mdash; 54 Pays</p>
+                            <p class="proj-desc">12&nbsp;335 observations &middot; 2020&ndash;2024. 8 modules analytiques, 12 cartes choropl&egrave;thes, r&eacute;gression OLS, ANOVA &eta;&sup2;, Pearson. CFR moyen 2,1&nbsp;%. Interface bilingue EN/FR. Stack Python &middot; Dash &middot; Plotly.</p>
+                            <div class="proj-metrics">
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">54</span>
+                                    <span class="proj-metric-label">Pays</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">12&nbsp;335</span>
+                                    <span class="proj-metric-label">Observations</span>
+                                </div>
+                                <div class="proj-metric">
+                                    <span class="proj-metric-value">8</span>
+                                    <span class="proj-metric-label">Modules</span>
+                                </div>
+                            </div>
+                            <div class="proj-stack">
+                                <span class="proj-tech">Python</span>
+                                <span class="proj-tech">Dash</span>
+                                <span class="proj-tech">Plotly</span>
+                                <span class="proj-tech">SciPy</span>
+                                <span class="proj-tech">Folium</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="javascript:void(0)" class="proj-link proj-link--doc" onclick="cvOpenDocModal();">
+                                <span>&#128214;</span> Doc
+                            </a>
+                            <a href="javascript:void(0)" class="proj-link proj-link--demo" onclick="cvOpenDemoModal();">
+                                <span>&#9654;</span> D&eacute;mo
+                            </a>
+                            <a href="https://abdousamad387.github.io/COVID_19/" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--test">
+                                <span>&#128640;</span> Tester
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ==================== SPATIAL ANALYSIS ==================== -->
+
+                    <!-- Travaux Pratiques Analyse Spatiale -->
+                    <div class="proj-card animate-in" style="--delay: 1.0s" data-category="spatial-analysis">
+                        <div class="proj-card-top">
+                            <div class="proj-category-badge proj-badge--spatial">Spatial Analysis</div>
+                            <div class="proj-card-visual proj-visual--spatial">
+                                <span class="proj-visual-icon">&#128506;</span>
+                                <div class="proj-visual-grid">
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="proj-name">Travaux Pratiques, Analyse Spatiale</h3>
+                            <p class="proj-desc">Série de TP avancés en analyse spatiale, géostatistique, interpolation, modélisation de surfaces et analyse multicritères appliquées à des cas réels en Afrique de l'Ouest.</p>
+                            <div class="proj-stack">
+                                <span class="proj-tech">QGIS</span>
+                                <span class="proj-tech">ArcGIS</span>
+                                <span class="proj-tech">Géostatistique</span>
+                                <span class="proj-tech">IDW</span>
+                            </div>
+                        </div>
+                        <div class="proj-card-footer">
+                            <a href="PROJETS/Spatial%20Analysis/Rapport%20de%20Travaux%20Pratiques.pdf" target="_blank" rel="noopener noreferrer" class="proj-link proj-link--doc">
+                                <span>&#128196;</span> Rapport PDF
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="section">
+            <div class="section-inner">
+                <!-- En-tête section -->
+                <div class="section-header animate-in" style="--delay: 0.2s">
+                    <span class="section-tag">Ce que les chiffres disent</span>
+                    <span class="section-tag" data-i18n="impact.tag">Measurable Results</span>
+                    <h2 class="section-title" data-i18n-html="impact.title">Impact &amp; <span class="title-accent">Key Results</span></h2>
+                    <p class="section-desc" data-i18n="impact.desc">Measurable results, scalable solutions, proven across territories, continents, and challenges.</p>
+                </div>
+
+                <!-- Grille de stats principales -->
+                <div class="impact-grid animate-in" style="--delay: 0.4s">
+                    <div class="impact-card impact-card--highlight">
+                        <div class="impact-icon">&#127919;</div>
+                        <div class="impact-value"><span class="counter" data-target="95.09">0</span><span class="impact-unit">%</span></div>
+                        <div class="impact-label" data-i18n="impact.l1">Random Forest Accuracy</div>
+                        <div class="impact-detail">Kappa = 0,885, TERRASIGHT v1.0</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">&#127758;</div>
+                        <div class="impact-value"><span class="counter" data-target="3847">0</span><span class="impact-unit"> km²</span></div>
+                        <div class="impact-label" data-i18n="impact.l2">Mapped areas</div>
+                        <div class="impact-detail" data-i18n="impact.d2">Land use change, Greater Dakar 2000–2025</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">&#127793;</div>
+                        <div class="impact-value"><span class="counter" data-target="2631">0</span><span class="impact-unit"> km²</span></div>
+                        <div class="impact-label" data-i18n="impact.l3">Degraded vegetation detected</div>
+                        <div class="impact-detail" data-i18n="impact.d3">High-resolution LiDAR GEDI analysis</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">&#128640;</div>
+                        <div class="impact-value"><span class="counter" data-target="8">0</span><span class="impact-unit"> apps</span></div>
+                        <div class="impact-label" data-i18n="impact.l4">WebGIS deployed</div>
+                        <div class="impact-detail" data-i18n="impact.d4">Public applications in production</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-icon">&#128752;</div>
+                        <div class="impact-value"><span class="counter" data-target="25">0</span><span class="impact-unit"> ans</span></div>
+                        <div class="impact-label" data-i18n="impact.l5">Satellite data processed</div>
+                        <div class="impact-detail">NASA/ESA, Landsat, Sentinel, MODIS, GEDI</div>
+                    </div>
+                    <div class="impact-card impact-card--highlight">
+                        <div class="impact-icon">&#128167;</div>
+                        <div class="impact-value"><span class="counter" data-target="800000">0</span></div>
+                        <div class="impact-label" data-i18n="impact.l6">Residents protected</div>
+                        <div class="impact-detail" data-i18n="impact.d6">AquaMind, Flood forecasting, 92% accuracy</div>
+                    </div>
+                </div>
+
+                <!-- Barre de résultats complémentaires -->
+                <div class="impact-metrics animate-in" style="--delay: 0.6s">
+                    <div class="metric-pill">
+                        <span class="metric-icon">&#128200;</span>
+                        <span class="metric-text" data-i18n-html="impact.m1"><strong>+23%</strong> modeled agricultural yields</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="metric-icon">&#9889;</span>
+                        <span class="metric-text" data-i18n-html="impact.m2"><strong>+17%</strong> modeled energy production</span>
+                    </div>
+                </div>
+
+                <!-- Reconnaissances -->
+                <div class="impact-awards animate-in" style="--delay: 0.8s">
+                    <h3 class="awards-title" data-i18n="impact.awards.title">Recognition</h3>
+                    <div class="awards-grid">
+                        <div class="award-card">
+                            <div class="award-badge">&#127942;</div>
+                            <div class="award-content">
+                                <div class="award-name" data-i18n="impact.award.1.name">1st Prize Hackathon KAIKAI'DEV</div>
+                                <div class="award-desc" data-i18n="impact.award.1.desc">AIRSEN project, 45 teams competing</div>
+                            </div>
+                        </div>
+                        <div class="award-card">
+                            <div class="award-badge">&#11088;</div>
+                            <div class="award-content">
+                                <div class="award-name" data-i18n="impact.award.2.name">Finalist Grand Prize of the President</div>
+                                <div class="award-desc" data-i18n="impact.award.2.desc">Selected among 500+ national projects</div>
+                            </div>
+                        </div>
+                        <div class="award-card">
+                            <div class="award-badge">&#127759;</div>
+                            <div class="award-content">
+                                <div class="award-name" data-i18n="impact.award.3.name">World Bank Group Youth Summit 2025 Delegate</div>
+                                <div class="award-desc" data-i18n="impact.award.3.desc">Washington D.C., Official representative</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="blog" class="section">
+            <div class="section-inner" style="max-width:1100px;">
+
+                <!-- En-tête -->
+                <div class="section-header animate-in" style="--delay:0.1s; margin-bottom:2.5rem;">
+                    <span class="section-tag" data-i18n-html="blog.tag">Path &amp; References</span>
+                    <h2 class="section-title" data-i18n-html="blog.title">Articles, <span class="title-accent">Awards</span> &amp; Certifications</h2>
+                    <p class="section-desc">Références scientifiques mobilisées, distinctions obtenues et formations continues.</p>
+                </div>
+
+                <!-- Onglets -->
+                <div class="blog-tabs animate-in" style="--delay:0.2s;">
+                    <button class="blog-tab blog-tab--active" data-blog="articles">&#128196; Articles &amp; Références</button>
+                    <button class="blog-tab" data-blog="awards">&#127942; Awards</button>
+                    <button class="blog-tab" data-blog="certif">&#127891; Certifications</button>
+                </div>
+
+                <!-- ── PANEL ARTICLES ── -->
+                <div id="blog-articles" class="blog-panel blog-panel--active animate-in" style="--delay:0.3s;">
+                    <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:1.75rem;font-style:italic;">
+                        &#128218; Références scientifiques fondatrices mobilisées dans mes projets, articles en co-publication à venir.
+                    </p>
+                    <div class="ref-list">
+
+                        <div class="ref-card">
+                            <span class="ref-num">01</span>
+                            <div class="ref-body">
+                                <div class="ref-title">Google Earth Engine: Planetary-scale geospatial analysis for everyone</div>
+                                <div class="ref-authors">Gorelick N., Hancher M., Dixon M., Ilyushchenko S., Thau D., Moore R.</div>
+                                <div class="ref-journal">&#128218; <em>Remote Sensing of Environment</em>, 202, 18–27 &mdash; 2017</div>
+                                <div class="ref-usage">&#128205; Utilisé dans <strong>TERRASIGHT</strong>, moteur d'analyse satellite sur 25 ans</div>
+                            </div>
+                            <span class="ref-tag">GEE</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">02</span>
+                            <div class="ref-body">
+                                <div class="ref-title">Random Forests</div>
+                                <div class="ref-authors">Breiman L.</div>
+                                <div class="ref-journal">&#128218; <em>Machine Learning</em>, 45(1), 5–32 &mdash; 2001</div>
+                                <div class="ref-usage">&#128205; Utilisé dans <strong>TERRASIGHT</strong>, classification occupation sols (95,09 %, Kappa 0,885)</div>
+                            </div>
+                            <span class="ref-tag">ML</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">03</span>
+                            <div class="ref-body">
+                                <div class="ref-title">The Global Ecosystem Dynamics Investigation: High-resolution laser ranging of Earth's forests and topography</div>
+                                <div class="ref-authors">Dubayah R., Blair J.B., Goetz S., Fatoyinbo L., Hansen M., et al.</div>
+                                <div class="ref-journal">&#128218; <em>Science of Remote Sensing</em>, 1, 100002 &mdash; 2020</div>
+                                <div class="ref-usage">&#128205; Utilisé dans <strong>TERRASIGHT</strong>, détection dégradation végétale (2 631 km²) via LiDAR GEDI</div>
+                            </div>
+                            <span class="ref-tag">LiDAR</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">04</span>
+                            <div class="ref-body">
+                                <div class="ref-title">Red and photographic infrared linear combinations for monitoring vegetation</div>
+                                <div class="ref-authors">Tucker C.J.</div>
+                                <div class="ref-journal">&#128218; <em>Remote Sensing of Environment</em>, 8(2), 127–150 &mdash; 1979</div>
+                                <div class="ref-usage">&#128205; Fondement du <strong>NDVI</strong>, indice de végétation utilisé dans TERRASIGHT &amp; AGRI Africa</div>
+                            </div>
+                            <span class="ref-tag">NDVI</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">05</span>
+                            <div class="ref-body">
+                                <div class="ref-title">Sentinel-2: ESA's Optical High-Resolution Mission for GMES Operational Services</div>
+                                <div class="ref-authors">Drusch M., Del Bello U., Carlier S., Colin O., Fernandez V., et al.</div>
+                                <div class="ref-journal">&#128218; <em>Remote Sensing of Environment</em>, 120, 25–36 &mdash; 2012</div>
+                                <div class="ref-usage">&#128205; Données Sentinel-2 intégrées dans <strong>TERRASIGHT</strong> pour l'analyse multi-temporelle</div>
+                            </div>
+                            <span class="ref-tag">RS</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">06</span>
+                            <div class="ref-body">
+                                <div class="ref-title">WHO Global Air Quality Guidelines, Particulate matter (PM2.5 &amp; PM10), ozone, NO₂, SO₂ and CO</div>
+                                <div class="ref-authors">World Health Organization</div>
+                                <div class="ref-journal">&#128218; <em>WHO Guidelines</em>, Genève &mdash; 2021</div>
+                                <div class="ref-usage">&#128205; Seuils OMS appliqués dans <strong>AIRSEN</strong>, 92,7 % des écoles au-dessus du seuil PM2.5</div>
+                            </div>
+                            <span class="ref-tag">Air</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">07</span>
+                            <div class="ref-body">
+                                <div class="ref-title">Local Indicators of Spatial Association, LISA</div>
+                                <div class="ref-authors">Anselin L.</div>
+                                <div class="ref-journal">&#128218; <em>Geographical Analysis</em>, 27(2), 93–115 &mdash; 1995</div>
+                                <div class="ref-usage">&#128205; Autocorrélation spatiale appliquée dans <strong>AIRSEN</strong> &amp; <strong>Africa Finance WebGIS</strong></div>
+                            </div>
+                            <span class="ref-tag">Spatial</span>
+                        </div>
+
+                        <div class="ref-card">
+                            <span class="ref-num">08</span>
+                            <div class="ref-body">
+                                <div class="ref-title">An Introduction to Statistical Learning, with Applications in R</div>
+                                <div class="ref-authors">James G., Witten D., Hastie T., Tibshirani R.</div>
+                                <div class="ref-journal">&#128218; <em>Springer</em>, 2e éd. &mdash; 2021</div>
+                                <div class="ref-usage">&#128205; Base théorique des modèles ML utilisés dans <strong>Prédiction Décrochage Étudiants</strong></div>
+                            </div>
+                            <span class="ref-tag">ML</span>
+                        </div>
+
+                        <div class="ref-card ref-card--coming">
+                            <span class="ref-num">&#9997;</span>
+                            <div class="ref-body">
+                                <div class="ref-title" style="color:var(--star-color);">Articles en co-publication, À paraître</div>
+                                <div class="ref-authors">Abdou Samad Faye et al.</div>
+                                <div class="ref-journal" style="color:var(--text-muted);">Revues scientifiques internationales spécialisées en Géomatique, Remote Sensing &amp; Data Science</div>
+                                <div class="ref-usage" style="color:var(--accent);">&#9203; Travaux en cours, publications attendues 2025–2026</div>
+                            </div>
+                            <span class="ref-tag" style="background:rgba(255,215,0,.12);color:var(--star-color);border-color:rgba(255,215,0,.25);">Soon</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── PANEL AWARDS ── -->
+                <div id="blog-awards" class="blog-panel animate-in" style="--delay:0.3s;">
+                    <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:1.75rem;font-style:italic;">
+                        &#127942; Distinctions et reconnaissances obtenues lors de compétitions nationales et internationales.
+                    </p>
+                    <div class="award-list">
+
+                        <div class="award-card award-card--gold">
+                            <div class="award-medal">&#129351;</div>
+                            <div class="award-body">
+                                <div class="award-title">Grand Prix du Chef de l'État</div>
+                                <div class="award-project">GéoGardien Bleu, Plateforme de surveillance maritime par imagerie satellite &amp; drone solaire</div>
+                                <div class="award-desc">Distinction présidentielle pour une solution innovante de surveillance des zones côtières et maritimes du Sénégal, combinant imagerie satellite haute résolution et drones solaires autonomes.</div>
+                            </div>
+                            <div class="award-meta">
+                                <span class="award-badge" style="background:rgba(255,215,0,.12);color:#ffd700;border-color:rgba(255,215,0,.3);">&#127949; Grand Prix National</span>
+                            </div>
+                        </div>
+
+                        <div class="award-card award-card--gold">
+                            <div class="award-medal">&#129351;</div>
+                            <div class="award-body">
+                                <div class="award-title">1er Prix, Hackathon KAIKAI'DEV</div>
+                                <div class="award-project">AIRSEN, Système de monitoring de la qualité de l'air dans les écoles sénégalaises</div>
+                                <div class="award-desc">1er prix parmi 45 équipes en compétition. Détection PM2.5, NO₂, CO₂ dans 1 066 écoles sur 14 régions avec alertes géolocalisées et interface WebGIS.</div>
+                            </div>
+                            <div class="award-meta">
+                                <span class="award-badge" style="background:rgba(255,215,0,.12);color:#ffd700;border-color:rgba(255,215,0,.3);">&#127942; 1er / 45 équipes</span>
+                            </div>
+                        </div>
+
+                        <div class="award-card award-card--silver">
+                            <div class="award-medal">&#129352;</div>
+                            <div class="award-body">
+                                <div class="award-title">Prix Meilleur Projet Transparence, Govathon Sénégal</div>
+                                <div class="award-project">AARSUNUSUUF, Plateforme de gestion foncière et de surveillance territoriale</div>
+                                <div class="award-desc">Reconnaissance nationale pour une solution de transparence dans la gestion des terres au Sénégal, intégrant cartographie participative et suivi en temps réel des occupations foncières.</div>
+                            </div>
+                            <div class="award-meta">
+                                <span class="award-badge" style="background:rgba(168,199,255,.1);color:#a8c7ff;border-color:rgba(168,199,255,.25);">&#127963; Gouvernance &amp; Civic Tech</span>
+                            </div>
+                        </div>
+
+                        <div class="award-card award-card--silver">
+                            <div class="award-medal">&#129352;</div>
+                            <div class="award-body">
+                                <div class="award-title">Top 5 Projets, Salon International des Mines (SIM)</div>
+                                <div class="award-project">AARSUNUMINE, Solution géospatiale pour le secteur minier</div>
+                                <div class="award-desc">Sélection parmi les meilleurs projets innovants du Salon International des Mines pour une plateforme de suivi et de transparence des activités minières par analyse géospatiale.</div>
+                            </div>
+                            <div class="award-meta">
+                                <span class="award-badge" style="background:rgba(168,199,255,.1);color:#a8c7ff;border-color:rgba(168,199,255,.25);">&#128270; Top 5 International</span>
+                            </div>
+                        </div>
+
+                        <div class="award-card award-card--bronze">
+                            <div class="award-medal">&#127942;</div>
+                            <div class="award-body">
+                                <div class="award-title">Reconnaissance OMVS, AquaMind</div>
+                                <div class="award-project">AquaMind, Système de prédiction des crues et de gestion des risques d'inondation</div>
+                                <div class="award-desc">Partenariat et reconnaissance de l'Organisation pour la Mise en Valeur du fleuve Sénégal (OMVS) pour une solution d'alerte précoce aux inondations avec 92 % de fiabilité prédictive.</div>
+                            </div>
+                            <div class="award-meta">
+                                <span class="award-badge" style="background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.25);">&#127754; Partenariat Institutionnel</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── PANEL CERTIFICATIONS ── -->
+                <div id="blog-certif" class="blog-panel animate-in" style="--delay:0.3s;">
+                    <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:1.75rem;font-style:italic;">
+                        &#127891; Formation continue et certifications professionnelles.
+                    </p>
+                    <div class="certif-grid">
+
+                        <div class="certif-card certif-card--coming">
+                            <div class="certif-icon">&#127891;</div>
+                            <div class="certif-body">
+                                <div class="certif-name">Certifications en cours de préparation</div>
+                                <div class="certif-org">Google, Microsoft, ESRI, Coursera</div>
+                                <div class="certif-desc">Google Earth Engine Developer Certification, Microsoft Azure AI, ArcGIS Pro Specialist, Deep Learning for Remote Sensing, certifications ciblées en 2025–2026.</div>
+                            </div>
+                            <span class="certif-status certif-status--soon">En cours &#9203;</span>
+                        </div>
+
+                        <div class="certif-card certif-card--coming">
+                            <div class="certif-icon">&#127758;</div>
+                            <div class="certif-body">
+                                <div class="certif-name">Master Géomatique &amp; Analyse Spatiale</div>
+                                <div class="certif-org">Université Cheikh Anta Diop (UCAD), Dakar, Sénégal</div>
+                                <div class="certif-desc">Formation académique de haut niveau en Géosciences Appliquées, Télédétection, Data Science spatiale, IA appliquée, Analyse multicritère et modélisation environnementale.</div>
+                            </div>
+                            <span class="certif-status" style="background:rgba(108,99,255,.12);color:var(--accent);border:1px solid rgba(108,99,255,.25);">&#127891; Diplôme</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <style>
+          /* ── BLOG TABS ── */
+          .blog-tabs {
+            display: flex; gap: 1rem; margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border); padding-bottom: 0;
+          }
+          .blog-tab {
+            background: none; border: none; border-bottom: 3px solid transparent;
+            color: var(--text-muted); font-size: 1rem; font-weight: 600;
+            padding: .75rem 1.25rem; cursor: pointer; transition: all .25s;
+            letter-spacing: .02em; margin-bottom: -1px;
+          }
+          .blog-tab:hover { color: var(--text-primary); }
+          .blog-tab--active { color: var(--accent); border-bottom-color: var(--accent); }
+
+          /* ── BLOG PANELS ── */
+          .blog-panel { display: none; min-height: 400px; }
+          .blog-panel--active { display: block; }
+
+          /* ── REFERENCES ── */
+          .ref-list { display: flex; flex-direction: column; gap: 1rem; }
+          .ref-card {
+            display: flex; align-items: flex-start; gap: 1.25rem;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.25rem 1.5rem;
+            transition: border-color .3s, transform .3s;
+          }
+          .ref-card:hover { border-color: rgba(108,99,255,.3); transform: translateX(4px); }
+          .ref-card--coming { border-color: rgba(255,215,0,.15); }
+          .ref-num {
+            font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem;
+            font-weight: 800; color: var(--accent); min-width: 32px;
+          }
+          .ref-body { flex: 1; }
+          .ref-title { font-size: .95rem; font-weight: 700; color: var(--text-primary); margin-bottom: .3rem; line-height: 1.4; }
+          .ref-authors { font-size: .82rem; color: var(--text-secondary); margin-bottom: .25rem; }
+          .ref-journal { font-size: .8rem; color: var(--text-muted); margin-bottom: .4rem; }
+          .ref-usage { font-size: .8rem; color: var(--text-muted); }
+          .ref-tag {
+            font-size: .68rem; font-weight: 700; padding: 4px 10px;
+            border-radius: 20px; background: rgba(108,99,255,.1);
+            color: var(--accent); border: 1px solid rgba(108,99,255,.2);
+            white-space: nowrap; align-self: flex-start;
+          }
+
+          /* ── AWARDS ── */
+          .award-list { display: flex; flex-direction: column; gap: 1.25rem; }
+          .award-card {
+            display: flex; align-items: flex-start; gap: 1.25rem;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.5rem;
+            transition: transform .3s, box-shadow .3s;
+          }
+          .award-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,.3); }
+          .award-card--gold { border-left: 4px solid #ffd700; }
+          .award-card--silver { border-left: 4px solid #a8c7ff; }
+          .award-card--bronze { border-left: 4px solid #4ade80; }
+          .award-medal { font-size: 2.2rem; min-width: 44px; text-align: center; }
+          .award-body { flex: 1; }
+          .award-title { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: .35rem; }
+          .award-project { font-size: .88rem; font-weight: 600; color: var(--accent); margin-bottom: .5rem; }
+          .award-desc { font-size: .85rem; color: var(--text-muted); line-height: 1.65; }
+          .award-meta { display: flex; align-items: flex-start; }
+          .award-badge {
+            font-size: .72rem; font-weight: 700; padding: 5px 12px;
+            border-radius: 20px; border: 1px solid; white-space: nowrap;
+          }
+
+          /* ── CERTIFICATIONS ── */
+          .certif-grid { display: flex; flex-direction: column; gap: 1.25rem; }
+          .certif-card {
+            display: flex; align-items: flex-start; gap: 1.25rem;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.5rem;
+          }
+          .certif-card--coming { border-color: rgba(255,215,0,.15); }
+          .certif-icon { font-size: 2rem; min-width: 40px; text-align: center; }
+          .certif-body { flex: 1; }
+          .certif-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: .3rem; }
+          .certif-org { font-size: .85rem; color: var(--accent); font-weight: 600; margin-bottom: .4rem; }
+          .certif-desc { font-size: .84rem; color: var(--text-muted); line-height: 1.65; }
+          .certif-status {
+            font-size: .75rem; font-weight: 700; padding: 5px 12px;
+            border-radius: 20px; white-space: nowrap; align-self: flex-start;
+            background: rgba(255,215,0,.1); color: var(--star-color);
+            border: 1px solid rgba(255,215,0,.25);
+          }
+        </style>
+
+        <script>
+        /* ── Blog tabs ── */
+        document.addEventListener('DOMContentLoaded', function () {
+          var tabs = document.querySelectorAll('.blog-tab');
+          var panels = document.querySelectorAll('.blog-panel');
+          tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+              tabs.forEach(function (t) { t.classList.remove('blog-tab--active'); });
+              panels.forEach(function (p) { p.classList.remove('blog-panel--active'); });
+              tab.classList.add('blog-tab--active');
+              var target = document.getElementById('blog-' + tab.getAttribute('data-blog'));
+              if (target) target.classList.add('blog-panel--active');
+            });
+          });
+        });
+        </script>
+
+        <section id="contact" class="section">
+            <div class="section-inner" style="max-width: 860px;">
+
+                <!-- En-tête -->
+                <div class="section-header animate-in" style="--delay:0.1s; margin-bottom: 3rem;">
+                    <span class="section-tag" data-i18n="contact.tag">Let's work together</span>
+                    <h2 class="section-title" data-i18n-html="contact.title">Ready to <span class="title-accent">Collaborate&nbsp;?</span></h2>
+                    <p class="section-desc" style="font-size:1.05rem; line-height:1.75; max-width:620px; margin:0 auto;" data-i18n-html="contact.desc">Geo-Data Scientist and geospatial engineer, I transform complex planetary data into clear, strategic decisions.<br>Open to missions, research collaborations, and partnerships worldwide, <strong style="color:var(--accent)">let's build something that matters, together.</strong></p>
+                </div>
+
+                <!-- Cartes de contact -->
+                <div class="animate-in" style="--delay:0.25s; display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2.5rem;">
+
+                    <!-- Email -->
+                    <a href="mailto:asfbigboss2001@gmail.com" class="contact-card" style="text-decoration:none;">
+                        <div class="contact-card-icon" style="background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(108,99,255,.05)); border-color:rgba(108,99,255,.25);">
+                            <span style="font-size:2rem;">&#9993;</span>
+                        </div>
+                        <div class="contact-card-label">Email</div>
+                        <div class="contact-card-value">asfbigboss2001@gmail.com</div>
+                        <div class="contact-card-cta" data-i18n="contact.email.cta">Send a message &#8594;</div>
+                    </a>
+
+                    <!-- LinkedIn -->
+                    <a href="https://www.linkedin.com/in/abdou-samad-faye-a2a23230a" target="_blank" rel="noopener noreferrer" class="contact-card" style="text-decoration:none;">
+                        <div class="contact-card-icon" style="background:linear-gradient(135deg,rgba(0,119,181,.15),rgba(0,119,181,.05)); border-color:rgba(0,119,181,.3);">
+                            <span style="font-size:2rem;">&#128101;</span>
+                        </div>
+                        <div class="contact-card-label">LinkedIn</div>
+                        <div class="contact-card-value">Abdou Samad Faye</div>
+                        <div class="contact-card-cta" data-i18n="contact.linkedin.cta">View profile &#8594;</div>
+                    </a>
+
+                    <!-- GitHub -->
+                    <a href="https://github.com/abdousamad387" target="_blank" rel="noopener noreferrer" class="contact-card" style="text-decoration:none;">
+                        <div class="contact-card-icon" style="background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02)); border-color:rgba(255,255,255,.12);">
+                            <span style="font-size:2rem;">&#128187;</span>
+                        </div>
+                        <div class="contact-card-label">GitHub</div>
+                        <div class="contact-card-value">abdousamad387</div>
+                        <div class="contact-card-cta" data-i18n="contact.github.cta">View projects &#8594;</div>
+                    </a>
+
+                </div>
+
+                <!-- Bannière d'accroche finale -->
+                <div class="animate-in" style="--delay:0.4s; background:linear-gradient(135deg,rgba(108,99,255,.08),rgba(255,215,0,.04)); border:1px solid rgba(108,99,255,.18); border-radius:18px; padding:2rem 2.5rem; text-align:center;">
+                    <p style="font-size:1.15rem; color:var(--text-primary); font-weight:600; margin-bottom:.6rem;" data-i18n-html="contact.banner1">
+                        &#128640;&nbsp; From planetary data to informed decisions, wherever you are, whatever the challenge.
+                    </p>
+                    <p style="font-size:.95rem; color:var(--text-muted); line-height:1.7;" data-i18n-html="contact.banner2">
+                        Interactive maps, ML models, geospatial dashboards or WebGIS , <br>
+                        I deliver solutions with <em style="color:var(--accent)">strong, measurable, global impact</em>, on time.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <style>
+          .contact-card {
+            display: flex; flex-direction: column; align-items: center;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 2rem 1.5rem; gap: .75rem;
+            transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+            cursor: pointer;
+          }
+          .contact-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,.3);
+            border-color: rgba(108,99,255,.35);
+          }
+          .contact-card-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            border: 1px solid; display: flex; align-items: center; justify-content: center;
+            margin-bottom: .25rem;
+          }
+          .contact-card-label {
+            font-size: .72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--text-muted);
+          }
+          .contact-card-value {
+            font-size: .92rem; font-weight: 600; color: var(--text-primary);
+            text-align: center; word-break: break-all;
+          }
+          .contact-card-cta {
+            font-size: .8rem; color: var(--accent); font-weight: 600;
+            margin-top: .25rem;
+          }
+          .contact-card:hover .contact-card-cta { color: var(--star-color); }
+        </style>
+    </main>
+
+    <script src="assets/js/main.js"></script>
+
+    <!-- ══ TERRASIGHT, Modal Documentation ══ -->
+    <div id="ts-doc-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="Documentation TERRASIGHT">
+      <div class="ts-modal ts-doc">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#128225; TERRASIGHT &mdash; Documentation</span>
+          <button id="ts-doc-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <!-- Carrousel de photos -->
+        <div class="ts-carousel">
+          <img class="ts-carousel-img active" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/agriculture%20et%20farm.png" alt="Agriculture &amp; Farm">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/biophisical.png" alt="Biophysique">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/DSS%20SCORE%202024.png" alt="DSS Score 2024">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/GEDI%20LIDAR.png" alt="GEDI LiDAR">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/LST.png" alt="LST">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/NDVI.png" alt="NDVI">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/Profil.png" alt="Profil">
+          <img class="ts-carousel-img" src="PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/Documentation/Random%20forest%20projection%202026_2040.png" alt="RF Projection 2026-2040">
+          <button class="ts-carousel-btn ts-carousel-prev" onclick="tsCarouselPrev()" type="button" aria-label="Photo pr&eacute;c&eacute;dente">&#8249;</button>
+          <button class="ts-carousel-btn ts-carousel-next" onclick="tsCarouselNext()" type="button" aria-label="Photo suivante">&#8250;</button>
+          <div class="ts-carousel-counter" id="ts-carousel-counter">1 / 8</div>
+          <div class="ts-carousel-dots">
+            <span class="ts-carousel-dot active" onclick="tsCarouselGoto(0)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(1)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(2)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(3)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(4)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(5)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(6)"></span>
+            <span class="ts-carousel-dot" onclick="tsCarouselGoto(7)"></span>
+          </div>
+          <div class="ts-carousel-caption" id="ts-carousel-caption">Agriculture &amp; Farm</div>
+        </div>
+        <!-- Contenu README -->
+        <div class="ts-modal-body">
+          <div id="ts-readme-content" class="ts-readme-content">
+            <div class="ts-readme-loading">Chargement de la documentation&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TERRASIGHT, Modal Démonstration ══ -->
+    <div id="ts-demo-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="D&eacute;monstration TERRASIGHT">
+      <div class="ts-modal ts-demo">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#9654; TERRASIGHT &mdash; D&eacute;monstration</span>
+          <button id="ts-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-video-container">
+          <video id="ts-video" controls playsinline>
+            Votre navigateur ne supporte pas la lecture vid&eacute;o.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    /* =====================================================
+       TERRASIGHT, Logique interactive (IIFE isolé)
+       ===================================================== */
+    (function () {
+      'use strict';
+
+      var TS_NAMES = [
+        'Agriculture \u0026 Farm', 'Biophysique', 'DSS Score 2024', 'GEDI LiDAR',
+        'LST', 'NDVI', 'Profil', 'RF Projection 2026\u20132040'
+      ];
+      var TS_N = TS_NAMES.length;
+
+      /* ─── 1. BANDE MINIATURES (carte) ─────────────────── */
+      var tsThumbIdx = 0, tsThumbTimer = null;
+
+      function tsSetThumb(idx) {
+        tsThumbIdx = ((idx % TS_N) + TS_N) % TS_N;
+        var thumbs = document.querySelectorAll('.ts-thumb');
+        thumbs.forEach(function (t, i) { t.classList.toggle('active', i === tsThumbIdx); });
+        if (thumbs[tsThumbIdx]) {
+          // Scroll uniquement le strip horizontal, ne pas déclencher de scroll vertical sur la page
+          var strip = thumbs[tsThumbIdx].parentElement;
+          if (strip) {
+            var t = thumbs[tsThumbIdx];
+            strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.clientWidth) / 2, behavior: 'smooth' });
+          }
+        }
+      }
+      window.tsSetThumb = tsSetThumb;
+
+      window.tsNextThumb = function () {
+        clearInterval(tsThumbTimer);
+        tsSetThumb(tsThumbIdx + 1);
+        tsThumbTimer = setInterval(function () { tsSetThumb(tsThumbIdx + 1); }, 3000);
+      };
+      window.tsPrevThumb = function () {
+        clearInterval(tsThumbTimer);
+        tsSetThumb(tsThumbIdx - 1);
+        tsThumbTimer = setInterval(function () { tsSetThumb(tsThumbIdx + 1); }, 3000);
+      };
+
+      /* ─── 2. CARROUSEL DOC (modal) ────────────────────── */
+      var tsCarIdx = 0, tsCarTimer = null;
+
+      function tsCarUpdate() {
+        document.querySelectorAll('.ts-carousel-img').forEach(function (img, i) {
+          img.classList.toggle('active', i === tsCarIdx);
+        });
+        document.querySelectorAll('.ts-carousel-dot').forEach(function (dot, i) {
+          dot.classList.toggle('active', i === tsCarIdx);
+        });
+        var cap = document.getElementById('ts-carousel-caption');
+        if (cap) cap.textContent = TS_NAMES[tsCarIdx];
+        var ctr = document.getElementById('ts-carousel-counter');
+        if (ctr) ctr.textContent = (tsCarIdx + 1) + ' / ' + TS_N;
+      }
+
+      function tsCarGo(idx) {
+        tsCarIdx = ((idx % TS_N) + TS_N) % TS_N;
+        tsCarUpdate();
+      }
+
+      function tsCarStartTimer() {
+        clearInterval(tsCarTimer);
+        tsCarTimer = setInterval(function () { tsCarGo(tsCarIdx + 1); }, 3000);
+      }
+
+      window.tsCarouselPrev = function () { clearInterval(tsCarTimer); tsCarGo(tsCarIdx - 1); tsCarStartTimer(); };
+      window.tsCarouselNext = function () { clearInterval(tsCarTimer); tsCarGo(tsCarIdx + 1); tsCarStartTimer(); };
+      window.tsCarouselGoto = function (i) { clearInterval(tsCarTimer); tsCarGo(i); tsCarStartTimer(); };
+
+      /* ─── 3. CHARGEMENT README ──────────────────────── */
+      var tsReadmeLoaded = false;
+
+      function tsLoadReadme() {
+        var el = document.getElementById('ts-readme-content');
+        if (!el || tsReadmeLoaded) return;
+        var url = 'PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/README.md';
+        fetch(url)
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+          .then(function (md) {
+            if (window.marked) {
+              el.innerHTML = window.marked.parse(md);
+            } else {
+              el.innerHTML = '<pre style="white-space:pre-wrap;color:#c4c4d4;font-size:12px;padding:16px">'
+                + md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+            }
+            tsReadmeLoaded = true;
+          })
+          .catch(function (err) {
+            if (el) el.innerHTML = '<div style="padding:32px;text-align:center;color:#ef4444">Impossible de charger README.md (' + err.message + ')</div>';
+          });
+      }
+
+      /* ─── 4. CONTRÔLE MODAUX ────────────────────────── */
+      function tsOpenModal(id) {
+        var m = document.getElementById(id);
+        if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      }
+
+      function tsCloseModal(id) {
+        var m = document.getElementById(id);
+        if (!m) return;
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+        if (id === 'ts-demo-modal') {
+          var v = document.getElementById('ts-video');
+          if (v) { v.pause(); v.currentTime = 0; }
+        }
+        if (id === 'ts-doc-modal') clearInterval(tsCarTimer);
+      }
+
+      window.tsOpenDocModal = function () {
+        tsCarIdx = 0; tsCarUpdate();
+        tsOpenModal('ts-doc-modal');
+        tsLoadReadme();
+        tsCarStartTimer();
+      };
+
+      window.tsOpenDemoModal = function () {
+        var v = document.getElementById('ts-video');
+        if (v && !v.getAttribute('data-loaded')) {
+          var file = 'TERRASIGHT et 38 pages de plus - Profil 1 \u2013 Microsoft\u200b Edge 2026-04-15 01-12-58.mp4';
+          v.src = 'PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/video%20demo/' + encodeURIComponent(file);
+          v.setAttribute('data-loaded', '1');
+        }
+        tsOpenModal('ts-demo-modal');
+      };
+
+      /* ─── 5. INIT ────────────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', function () {
+        /* Démarrer le diaporama miniatures */
+        tsThumbTimer = setInterval(function () { tsSetThumb(tsThumbIdx + 1); }, 3000);
+
+        /* Boutons fermer */
+        var docClose = document.getElementById('ts-doc-close');
+        var demoClose = document.getElementById('ts-demo-close');
+        if (docClose) docClose.addEventListener('click', function () { tsCloseModal('ts-doc-modal'); });
+        if (demoClose) demoClose.addEventListener('click', function () { tsCloseModal('ts-demo-modal'); });
+
+        /* Fermer sur clic backdrop */
+        ['ts-doc-modal', 'ts-demo-modal'].forEach(function (id) {
+          var m = document.getElementById(id);
+          if (m) m.addEventListener('click', function (e) { if (e.target === m) tsCloseModal(id); });
+        });
+
+        /* Touche Échap + flèches */
+        document.addEventListener('keydown', function (e) {
+          var tsDocOpen = document.getElementById('ts-doc-modal') && document.getElementById('ts-doc-modal').classList.contains('open');
+          if (e.key === 'ArrowLeft'  && tsDocOpen) { clearInterval(tsCarTimer); tsCarGo(tsCarIdx - 1); tsCarStartTimer(); return; }
+          if (e.key === 'ArrowRight' && tsDocOpen) { clearInterval(tsCarTimer); tsCarGo(tsCarIdx + 1); tsCarStartTimer(); return; }
+          if (e.key !== 'Escape') return;
+          ['ts-doc-modal', 'ts-demo-modal'].forEach(function (id) {
+            var m = document.getElementById(id);
+            if (m && m.classList.contains('open')) tsCloseModal(id);
+          });
+        });
+      });
+    })();
+    </script>
+
+    <!-- ══ AIRSEN, Modal Documentation ══ -->
+    <div id="as-doc-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="Documentation AIRSEN">
+      <div class="ts-modal ts-doc">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#128225; AIRSEN &mdash; Documentation</span>
+          <button id="as-doc-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <!-- Carrousel de photos -->
+        <div class="ts-carousel">
+          <img class="as-carousel-img active" src="PROJETS/WebGIS%20Tools/AIRSEN/Documentation/profil%20airsen.png" alt="Profil AIRSEN">
+          <img class="as-carousel-img" src="PROJETS/WebGIS%20Tools/AIRSEN/Documentation/spatial%20autocorrolation.png" alt="Autocorr&eacute;lation Spatiale">
+          <img class="as-carousel-img" src="PROJETS/WebGIS%20Tools/AIRSEN/Documentation/statistiques%20par%20ecoles.png" alt="Statistiques par &Eacute;coles">
+          <button class="ts-carousel-btn ts-carousel-prev" onclick="asCarouselPrev()" type="button" aria-label="Photo pr&eacute;c&eacute;dente">&#8249;</button>
+          <button class="ts-carousel-btn ts-carousel-next" onclick="asCarouselNext()" type="button" aria-label="Photo suivante">&#8250;</button>
+          <div class="ts-carousel-counter" id="as-carousel-counter">1 / 3</div>
+          <div class="ts-carousel-dots" id="as-carousel-dots">
+            <span class="as-dot active" onclick="asCarouselGoto(0)"></span>
+            <span class="as-dot" onclick="asCarouselGoto(1)"></span>
+            <span class="as-dot" onclick="asCarouselGoto(2)"></span>
+          </div>
+          <div class="ts-carousel-caption" id="as-carousel-caption">Profil AIRSEN</div>
+        </div>
+        <!-- Contenu README -->
+        <div class="ts-modal-body">
+          <div id="as-readme-content" class="ts-readme-content">
+            <div class="ts-readme-loading">Chargement de la documentation&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AIRSEN, Modal Démonstration ══ -->
+    <div id="as-demo-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="D&eacute;monstration AIRSEN">
+      <div class="ts-modal ts-demo">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#9654; AIRSEN &mdash; D&eacute;monstration</span>
+          <button id="as-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-video-container">
+          <video id="as-video" controls playsinline>
+            Votre navigateur ne supporte pas la lecture vid&eacute;o.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .as-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.35);
+        cursor: pointer;
+        margin: 0 3px;
+        transition: background 0.2s;
+      }
+      .as-dot.active { background: #a78bfa; }
+    </style>
+
+    <script>
+    /* =====================================================
+       AIRSEN, Logique interactive (IIFE isolé)
+       ===================================================== */
+    (function () {
+      'use strict';
+
+      var AS_NAMES = [
+        'Profil AIRSEN',
+        'Autocorr\u00e9lation Spatiale',
+        'Statistiques par \u00c9coles'
+      ];
+      var AS_N = AS_NAMES.length;
+
+      /* ─── 1. BANDE MINIATURES (carte) ─────────────────── */
+      var asThumbIdx = 0, asThumbTimer = null;
+
+      function asSetThumb(idx) {
+        asThumbIdx = ((idx % AS_N) + AS_N) % AS_N;
+        var thumbs = document.querySelectorAll('.as-thumb');
+        thumbs.forEach(function (t, i) { t.classList.toggle('active', i === asThumbIdx); });
+        if (thumbs[asThumbIdx]) {
+          var strip = thumbs[asThumbIdx].parentElement;
+          if (strip) {
+            var t = thumbs[asThumbIdx];
+            strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.clientWidth) / 2, behavior: 'smooth' });
+          }
+        }
+      }
+      window.asSetThumb = asSetThumb;
+
+      window.asNextThumb = function () {
+        clearInterval(asThumbTimer);
+        asSetThumb(asThumbIdx + 1);
+        asThumbTimer = setInterval(function () { asSetThumb(asThumbIdx + 1); }, 3000);
+      };
+      window.asPrevThumb = function () {
+        clearInterval(asThumbTimer);
+        asSetThumb(asThumbIdx - 1);
+        asThumbTimer = setInterval(function () { asSetThumb(asThumbIdx + 1); }, 3000);
+      };
+
+      /* ─── 2. CARROUSEL DOC (modal) ────────────────────── */
+      var asCarIdx = 0, asCarTimer = null;
+
+      function asCarUpdate() {
+        document.querySelectorAll('.as-carousel-img').forEach(function (img, i) {
+          img.classList.toggle('active', i === asCarIdx);
+        });
+        document.querySelectorAll('.as-dot').forEach(function (dot, i) {
+          dot.classList.toggle('active', i === asCarIdx);
+        });
+        var cap = document.getElementById('as-carousel-caption');
+        if (cap) cap.textContent = AS_NAMES[asCarIdx];
+        var ctr = document.getElementById('as-carousel-counter');
+        if (ctr) ctr.textContent = (asCarIdx + 1) + ' / ' + AS_N;
+      }
+
+      function asCarGo(idx) {
+        asCarIdx = ((idx % AS_N) + AS_N) % AS_N;
+        asCarUpdate();
+      }
+
+      function asCarStartTimer() {
+        clearInterval(asCarTimer);
+        asCarTimer = setInterval(function () { asCarGo(asCarIdx + 1); }, 3000);
+      }
+
+      window.asCarouselPrev = function () { clearInterval(asCarTimer); asCarGo(asCarIdx - 1); asCarStartTimer(); };
+      window.asCarouselNext = function () { clearInterval(asCarTimer); asCarGo(asCarIdx + 1); asCarStartTimer(); };
+      window.asCarouselGoto = function (i) { clearInterval(asCarTimer); asCarGo(i); asCarStartTimer(); };
+
+      /* ─── 3. CHARGEMENT README ──────────────────────── */
+      var asReadmeLoaded = false;
+
+      function asLoadReadme() {
+        var el = document.getElementById('as-readme-content');
+        if (!el || asReadmeLoaded) return;
+        var url = 'https://raw.githubusercontent.com/abdousamad387/AIRSEN/main/README.md';
+        fetch(url)
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+          .then(function (md) {
+            if (window.marked) {
+              el.innerHTML = window.marked.parse(md);
+            } else {
+              el.innerHTML = '<pre style="white-space:pre-wrap;color:#c4c4d4;font-size:12px;padding:16px">'
+                + md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+            }
+            asReadmeLoaded = true;
+          })
+          .catch(function (err) {
+            if (el) el.innerHTML = '<div style="padding:32px;text-align:center;color:#ef4444">Impossible de charger README.md (' + err.message + ')</div>';
+          });
+      }
+
+      /* ─── 4. CONTRÔLE MODAUX ────────────────────────── */
+      function asOpenModal(id) {
+        var m = document.getElementById(id);
+        if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      }
+
+      function asCloseModal(id) {
+        var m = document.getElementById(id);
+        if (!m) return;
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+        if (id === 'as-demo-modal') {
+          var v = document.getElementById('as-video');
+          if (v) { v.pause(); v.currentTime = 0; }
+        }
+        if (id === 'as-doc-modal') clearInterval(asCarTimer);
+      }
+
+      window.asOpenDocModal = function () {
+        asCarIdx = 0; asCarUpdate();
+        asOpenModal('as-doc-modal');
+        asLoadReadme();
+        asCarStartTimer();
+      };
+
+      window.asOpenDemoModal = function () {
+        var v = document.getElementById('as-video');
+        if (v && !v.getAttribute('data-loaded')) {
+          v.src = 'PROJETS/WebGIS%20Tools/AIRSEN/video%20demo.mp4';
+          v.setAttribute('data-loaded', '1');
+        }
+        asOpenModal('as-demo-modal');
+      };
+
+      /* ─── 5. INIT ────────────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', function () {
+        /* Démarrer le diaporama miniatures */
+        asThumbTimer = setInterval(function () { asSetThumb(asThumbIdx + 1); }, 3000);
+
+        /* Boutons fermer */
+        var docClose = document.getElementById('as-doc-close');
+        var demoClose = document.getElementById('as-demo-close');
+        if (docClose) docClose.addEventListener('click', function () { asCloseModal('as-doc-modal'); });
+        if (demoClose) demoClose.addEventListener('click', function () { asCloseModal('as-demo-modal'); });
+
+        /* Fermer sur clic backdrop */
+        ['as-doc-modal', 'as-demo-modal'].forEach(function (id) {
+          var m = document.getElementById(id);
+          if (m) m.addEventListener('click', function (e) { if (e.target === m) asCloseModal(id); });
+        });
+
+        /* Touche Échap */
+        /* Touche Échap + flèches */
+        document.addEventListener('keydown', function (e) {
+          var asDocOpen = document.getElementById('as-doc-modal') && document.getElementById('as-doc-modal').classList.contains('open');
+          if (e.key === 'ArrowLeft'  && asDocOpen) { clearInterval(asCarTimer); asCarGo(asCarIdx - 1); asCarStartTimer(); return; }
+          if (e.key === 'ArrowRight' && asDocOpen) { clearInterval(asCarTimer); asCarGo(asCarIdx + 1); asCarStartTimer(); return; }
+          if (e.key !== 'Escape') return;
+          ['as-doc-modal', 'as-demo-modal'].forEach(function (id) {
+            var m = document.getElementById(id);
+            if (m && m.classList.contains('open')) asCloseModal(id);
+          });
+        });
+      });
+    })();
+    </script>
+
+    <!-- ══ COVID-19, Modal Documentation ══ -->
+    <div id="cv-doc-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="Documentation COVID-19">
+      <div class="ts-modal ts-doc">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#128225; COVID-19 Africa &mdash; Documentation</span>
+          <button id="cv-doc-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <!-- Carrousel de photos -->
+        <div class="ts-carousel">
+          <img class="cv-carousel-img active" src="PROJETS/Data%20Analyst/COVID_19/Documentation/profil.png" alt="Profil">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Timeline%20epidemiologique.png" alt="Timeline &Eacute;pid&eacute;miologique">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Advanced%20statistics.png" alt="Advanced Statistics">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Distribution%20hierarchique%20des%20cas.png" alt="Distribution Hi&eacute;rarchique">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Individual%20chloropetre%20maps.png" alt="Cartes Choropl&egrave;thes">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/interactive%20charts.png" alt="Charts Interactifs">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/Distribution%20de%20la%20croissance%20Pib%20en%202020.png" alt="Croissance PIB 2020">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/pib%20par%20hbt%20vs%20cfr.png" alt="PIB/hbt vs CFR">
+          <img class="cv-carousel-img" src="PROJETS/Data%20Analyst/COVID_19/Documentation/treemap%20des%20cas%20par%20regions.png" alt="Treemap par R&eacute;gions">
+          <button class="ts-carousel-btn ts-carousel-prev" onclick="cvCarouselPrev()" type="button" aria-label="Photo pr&eacute;c&eacute;dente">&#8249;</button>
+          <button class="ts-carousel-btn ts-carousel-next" onclick="cvCarouselNext()" type="button" aria-label="Photo suivante">&#8250;</button>
+          <div class="ts-carousel-counter" id="cv-carousel-counter">1 / 9</div>
+          <div class="ts-carousel-dots">
+            <span class="cv-dot active" onclick="cvCarouselGoto(0)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(1)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(2)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(3)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(4)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(5)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(6)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(7)"></span>
+            <span class="cv-dot" onclick="cvCarouselGoto(8)"></span>
+          </div>
+          <div class="ts-carousel-caption" id="cv-carousel-caption">Profil</div>
+        </div>
+        <!-- Contenu README -->
+        <div class="ts-modal-body">
+          <div id="cv-readme-content" class="ts-readme-content">
+            <div class="ts-readme-loading">Chargement de la documentation&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ COVID-19, Modal Démonstration ══ -->
+    <div id="cv-demo-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="D&eacute;monstration COVID-19">
+      <div class="ts-modal ts-demo">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#9654; COVID-19 Africa &mdash; D&eacute;monstration</span>
+          <button id="cv-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-video-container">
+          <video id="cv-video" controls playsinline>
+            Votre navigateur ne supporte pas la lecture vid&eacute;o.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .cv-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.35);
+        cursor: pointer;
+        margin: 0 3px;
+        transition: background 0.2s;
+      }
+      .cv-dot.active { background: #f59e0b; }
+    </style>
+
+    <script>
+    /* =====================================================
+       COVID-19 Africa, Logique interactive (IIFE isolé)
+       ===================================================== */
+    (function () {
+      'use strict';
+
+      var CV_NAMES = [
+        'Profil',
+        'Timeline Épidémiologique',
+        'Advanced Statistics',
+        'Distribution Hiérarchique des Cas',
+        'Cartes Choroplèthes',
+        'Charts Interactifs',
+        'Croissance PIB 2020',
+        'PIB/hbt vs CFR',
+        'Treemap par Régions'
+      ];
+      var CV_N = CV_NAMES.length;
+
+      /* ─── 1. BANDE MINIATURES (carte) ─────────────────── */
+      var cvThumbIdx = 0, cvThumbTimer = null;
+
+      function cvSetThumb(idx) {
+        cvThumbIdx = ((idx % CV_N) + CV_N) % CV_N;
+        var thumbs = document.querySelectorAll('.cv-thumb');
+        thumbs.forEach(function (t, i) { t.classList.toggle('active', i === cvThumbIdx); });
+        if (thumbs[cvThumbIdx]) {
+          var strip = thumbs[cvThumbIdx].parentElement;
+          if (strip) {
+            var t = thumbs[cvThumbIdx];
+            strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.clientWidth) / 2, behavior: 'smooth' });
+          }
+        }
+      }
+      window.cvSetThumb = cvSetThumb;
+
+      window.cvNextThumb = function () {
+        clearInterval(cvThumbTimer);
+        cvSetThumb(cvThumbIdx + 1);
+        cvThumbTimer = setInterval(function () { cvSetThumb(cvThumbIdx + 1); }, 3000);
+      };
+      window.cvPrevThumb = function () {
+        clearInterval(cvThumbTimer);
+        cvSetThumb(cvThumbIdx - 1);
+        cvThumbTimer = setInterval(function () { cvSetThumb(cvThumbIdx + 1); }, 3000);
+      };
+
+      /* ─── 2. CARROUSEL DOC (modal) ────────────────────── */
+      var cvCarIdx = 0, cvCarTimer = null;
+
+      function cvCarUpdate() {
+        document.querySelectorAll('.cv-carousel-img').forEach(function (img, i) {
+          img.classList.toggle('active', i === cvCarIdx);
+        });
+        document.querySelectorAll('.cv-dot').forEach(function (dot, i) {
+          dot.classList.toggle('active', i === cvCarIdx);
+        });
+        var cap = document.getElementById('cv-carousel-caption');
+        if (cap) cap.textContent = CV_NAMES[cvCarIdx];
+        var ctr = document.getElementById('cv-carousel-counter');
+        if (ctr) ctr.textContent = (cvCarIdx + 1) + ' / ' + CV_N;
+      }
+
+      function cvCarGo(idx) {
+        cvCarIdx = ((idx % CV_N) + CV_N) % CV_N;
+        cvCarUpdate();
+      }
+
+      function cvCarStartTimer() {
+        clearInterval(cvCarTimer);
+        cvCarTimer = setInterval(function () { cvCarGo(cvCarIdx + 1); }, 3000);
+      }
+
+      window.cvCarouselPrev = function () { clearInterval(cvCarTimer); cvCarGo(cvCarIdx - 1); cvCarStartTimer(); };
+      window.cvCarouselNext = function () { clearInterval(cvCarTimer); cvCarGo(cvCarIdx + 1); cvCarStartTimer(); };
+      window.cvCarouselGoto = function (i) { clearInterval(cvCarTimer); cvCarGo(i); cvCarStartTimer(); };
+
+      /* ─── 3. CHARGEMENT README ──────────────────────── */
+      var cvReadmeLoaded = false;
+
+      function cvLoadReadme() {
+        var el = document.getElementById('cv-readme-content');
+        if (!el || cvReadmeLoaded) return;
+        var url = 'https://raw.githubusercontent.com/abdousamad387/COVID_19/master/README.md';
+        fetch(url)
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+          .then(function (md) {
+            if (window.marked) {
+              el.innerHTML = window.marked.parse(md);
+            } else {
+              el.innerHTML = '<pre style="white-space:pre-wrap;color:#c4c4d4;font-size:12px;padding:16px">'
+                + md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+            }
+            cvReadmeLoaded = true;
+          })
+          .catch(function (err) {
+            if (el) el.innerHTML = '<div style="padding:32px;text-align:center;color:#ef4444">Impossible de charger README.md (' + err.message + ')</div>';
+          });
+      }
+
+      /* ─── 4. CONTRÔLE MODAUX ────────────────────────── */
+      function cvOpenModal(id) {
+        var m = document.getElementById(id);
+        if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      }
+
+      function cvCloseModal(id) {
+        var m = document.getElementById(id);
+        if (!m) return;
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+        if (id === 'cv-demo-modal') {
+          var v = document.getElementById('cv-video');
+          if (v) { v.pause(); v.currentTime = 0; }
+        }
+        if (id === 'cv-doc-modal') clearInterval(cvCarTimer);
+      }
+
+      window.cvOpenDocModal = function () {
+        cvCarIdx = 0; cvCarUpdate();
+        cvOpenModal('cv-doc-modal');
+        cvLoadReadme();
+        cvCarStartTimer();
+      };
+
+      window.cvOpenDemoModal = function () {
+        var v = document.getElementById('cv-video');
+        if (v && !v.getAttribute('data-loaded')) {
+          var file = 'COVID-19 Africa, Epidemiological Dashboard _ Abdou Samad Faye et 36 pages de plus - Profil 1 – Microsoft​ Edge 2026-04-14 23-04-13.mp4';
+          v.src = 'PROJETS/Data%20Analyst/COVID_19/Video%20demo/' + encodeURIComponent(file);
+          v.setAttribute('data-loaded', '1');
+        }
+        cvOpenModal('cv-demo-modal');
+      };
+
+      /* ─── 5. INIT ────────────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', function () {
+        /* Démarrer le diaporama miniatures */
+        cvThumbTimer = setInterval(function () { cvSetThumb(cvThumbIdx + 1); }, 3000);
+
+        /* Boutons fermer */
+        var docClose = document.getElementById('cv-doc-close');
+        var demoClose = document.getElementById('cv-demo-close');
+        if (docClose) docClose.addEventListener('click', function () { cvCloseModal('cv-doc-modal'); });
+        if (demoClose) demoClose.addEventListener('click', function () { cvCloseModal('cv-demo-modal'); });
+
+        /* Fermer sur clic backdrop */
+        ['cv-doc-modal', 'cv-demo-modal'].forEach(function (id) {
+          var m = document.getElementById(id);
+          if (m) m.addEventListener('click', function (e) { if (e.target === m) cvCloseModal(id); });
+        });
+
+        /* Touche Échap */
+        /* Touche Échap + flèches */
+        document.addEventListener('keydown', function (e) {
+          var cvDocOpen = document.getElementById('cv-doc-modal') && document.getElementById('cv-doc-modal').classList.contains('open');
+          if (e.key === 'ArrowLeft'  && cvDocOpen) { clearInterval(cvCarTimer); cvCarGo(cvCarIdx - 1); cvCarStartTimer(); return; }
+          if (e.key === 'ArrowRight' && cvDocOpen) { clearInterval(cvCarTimer); cvCarGo(cvCarIdx + 1); cvCarStartTimer(); return; }
+          if (e.key !== 'Escape') return;
+          ['cv-doc-modal', 'cv-demo-modal'].forEach(function (id) {
+            var m = document.getElementById(id);
+            if (m && m.classList.contains('open')) cvCloseModal(id);
+          });
+        });
+      });
+    })();
+    </script>
+
+    <!-- ══ AGRI AFRICA, Modal Documentation ══ -->
+    <div id="aa-doc-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="Documentation AGRI Africa">
+      <div class="ts-modal ts-doc">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#127806; AGRI Africa Database &mdash; Documentation</span>
+          <button id="aa-doc-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-carousel">
+          <img class="aa-carousel-img active" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/profil.png" alt="Profil">
+          <img class="aa-carousel-img" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/agriculture%20production.png" alt="Production Agricole">
+          <img class="aa-carousel-img" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/climate.png" alt="Climat">
+          <img class="aa-carousel-img" src="PROJETS/Data%20Analyst/AGRI_Africa/Documentation/indices.png" alt="Indices">
+          <button class="ts-carousel-btn ts-carousel-prev" onclick="aaCarouselPrev()" type="button" aria-label="Photo pr&eacute;c&eacute;dente">&#8249;</button>
+          <button class="ts-carousel-btn ts-carousel-next" onclick="aaCarouselNext()" type="button" aria-label="Photo suivante">&#8250;</button>
+          <div class="ts-carousel-counter" id="aa-carousel-counter">1 / 4</div>
+          <div class="ts-carousel-dots">
+            <span class="aa-dot active" onclick="aaCarouselGoto(0)"></span>
+            <span class="aa-dot" onclick="aaCarouselGoto(1)"></span>
+            <span class="aa-dot" onclick="aaCarouselGoto(2)"></span>
+            <span class="aa-dot" onclick="aaCarouselGoto(3)"></span>
+          </div>
+          <div class="ts-carousel-caption" id="aa-carousel-caption">Profil</div>
+        </div>
+        <div class="ts-modal-body">
+          <div id="aa-readme-content" class="ts-readme-content">
+            <div class="ts-readme-loading">Chargement de la documentation&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AGRI AFRICA, Modal Démonstration ══ -->
+    <div id="aa-demo-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="D&eacute;monstration AGRI Africa">
+      <div class="ts-modal ts-demo">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#9654; AGRI Africa Database &mdash; D&eacute;monstration</span>
+          <button id="aa-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-video-container">
+          <video id="aa-video" controls playsinline>
+            Votre navigateur ne supporte pas la lecture vid&eacute;o.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .aa-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.35);
+        cursor: pointer;
+        margin: 0 3px;
+        transition: background 0.2s;
+      }
+      .aa-dot.active { background: #34d399; }
+    </style>
+
+    <script>
+    /* =====================================================
+       AGRI AFRICA, Logique interactive (IIFE isolé)
+       ===================================================== */
+    (function () {
+      'use strict';
+
+      var AA_NAMES = ['Profil', 'Production Agricole', 'Climat', 'Indices'];
+      var AA_N = AA_NAMES.length;
+
+      /* ─── 1. BANDE MINIATURES (carte) ─────────────────── */
+      var aaThumbIdx = 0, aaThumbTimer = null;
+
+      function aaSetThumb(idx) {
+        aaThumbIdx = ((idx % AA_N) + AA_N) % AA_N;
+        var thumbs = document.querySelectorAll('.aa-thumb');
+        thumbs.forEach(function (t, i) { t.classList.toggle('active', i === aaThumbIdx); });
+        if (thumbs[aaThumbIdx]) {
+          var strip = thumbs[aaThumbIdx].parentElement;
+          if (strip) {
+            var t = thumbs[aaThumbIdx];
+            strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.clientWidth) / 2, behavior: 'smooth' });
+          }
+        }
+      }
+      window.aaSetThumb = aaSetThumb;
+
+      window.aaNextThumb = function () {
+        clearInterval(aaThumbTimer);
+        aaSetThumb(aaThumbIdx + 1);
+        aaThumbTimer = setInterval(function () { aaSetThumb(aaThumbIdx + 1); }, 3000);
+      };
+      window.aaPrevThumb = function () {
+        clearInterval(aaThumbTimer);
+        aaSetThumb(aaThumbIdx - 1);
+        aaThumbTimer = setInterval(function () { aaSetThumb(aaThumbIdx + 1); }, 3000);
+      };
+
+      /* ─── 2. CARROUSEL DOC (modal) ────────────────────── */
+      var aaCarIdx = 0, aaCarTimer = null;
+
+      function aaCarUpdate() {
+        document.querySelectorAll('.aa-carousel-img').forEach(function (img, i) {
+          img.classList.toggle('active', i === aaCarIdx);
+        });
+        document.querySelectorAll('.aa-dot').forEach(function (dot, i) {
+          dot.classList.toggle('active', i === aaCarIdx);
+        });
+        var cap = document.getElementById('aa-carousel-caption');
+        if (cap) cap.textContent = AA_NAMES[aaCarIdx];
+        var ctr = document.getElementById('aa-carousel-counter');
+        if (ctr) ctr.textContent = (aaCarIdx + 1) + ' / ' + AA_N;
+      }
+
+      function aaCarGo(idx) {
+        aaCarIdx = ((idx % AA_N) + AA_N) % AA_N;
+        aaCarUpdate();
+      }
+
+      function aaCarStartTimer() {
+        clearInterval(aaCarTimer);
+        aaCarTimer = setInterval(function () { aaCarGo(aaCarIdx + 1); }, 3000);
+      }
+
+      window.aaCarouselPrev = function () { clearInterval(aaCarTimer); aaCarGo(aaCarIdx - 1); aaCarStartTimer(); };
+      window.aaCarouselNext = function () { clearInterval(aaCarTimer); aaCarGo(aaCarIdx + 1); aaCarStartTimer(); };
+      window.aaCarouselGoto = function (i) { clearInterval(aaCarTimer); aaCarGo(i); aaCarStartTimer(); };
+
+      /* ─── 3. CHARGEMENT README ──────────────────────── */
+      var aaReadmeLoaded = false;
+
+      function aaLoadReadme() {
+        var el = document.getElementById('aa-readme-content');
+        if (!el || aaReadmeLoaded) return;
+        var url = 'PROJETS/Data%20Analyst/AGRI_Africa/README.md';
+        fetch(url)
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+          .then(function (md) {
+            if (window.marked) {
+              el.innerHTML = window.marked.parse(md);
+            } else {
+              el.innerHTML = '<pre style="white-space:pre-wrap;color:#c4c4d4;font-size:12px;padding:16px">'
+                + md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+            }
+            aaReadmeLoaded = true;
+          })
+          .catch(function (err) {
+            if (el) el.innerHTML = '<div style="padding:32px;text-align:center;color:#ef4444">Impossible de charger README.md (' + err.message + ')</div>';
+          });
+      }
+
+      /* ─── 4. CONTRÔLE MODAUX ────────────────────────── */
+      function aaOpenModal(id) {
+        var m = document.getElementById(id);
+        if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      }
+
+      function aaCloseModal(id) {
+        var m = document.getElementById(id);
+        if (!m) return;
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+        if (id === 'aa-demo-modal') {
+          var v = document.getElementById('aa-video');
+          if (v) { v.pause(); v.currentTime = 0; }
+        }
+        if (id === 'aa-doc-modal') clearInterval(aaCarTimer);
+      }
+
+      window.aaOpenDocModal = function () {
+        aaCarIdx = 0; aaCarUpdate();
+        aaOpenModal('aa-doc-modal');
+        aaLoadReadme();
+        aaCarStartTimer();
+      };
+
+      window.aaOpenDemoModal = function () {
+        var v = document.getElementById('aa-video');
+        if (v && !v.getAttribute('data-loaded')) {
+          var file = 'Africa Agri Dashboard _ 2000-2024 et 36 pages de plus - Profil 1 – Microsoft​ Edge 2026-04-14 23-41-51.mp4';
+          v.src = 'PROJETS/Data%20Analyst/AGRI_Africa/video%20demo/' + encodeURIComponent(file);
+          v.setAttribute('data-loaded', '1');
+        }
+        aaOpenModal('aa-demo-modal');
+      };
+
+      /* ─── 5. INIT ────────────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', function () {
+        aaThumbTimer = setInterval(function () { aaSetThumb(aaThumbIdx + 1); }, 3000);
+
+        var docClose = document.getElementById('aa-doc-close');
+        var demoClose = document.getElementById('aa-demo-close');
+        if (docClose) docClose.addEventListener('click', function () { aaCloseModal('aa-doc-modal'); });
+        if (demoClose) demoClose.addEventListener('click', function () { aaCloseModal('aa-demo-modal'); });
+
+        ['aa-doc-modal', 'aa-demo-modal'].forEach(function (id) {
+          var m = document.getElementById(id);
+          if (m) m.addEventListener('click', function (e) { if (e.target === m) aaCloseModal(id); });
+        });
+
+        /* Touche Échap + flèches */
+        document.addEventListener('keydown', function (e) {
+          var aaDocOpen = document.getElementById('aa-doc-modal') && document.getElementById('aa-doc-modal').classList.contains('open');
+          if (e.key === 'ArrowLeft'  && aaDocOpen) { clearInterval(aaCarTimer); aaCarGo(aaCarIdx - 1); aaCarStartTimer(); return; }
+          if (e.key === 'ArrowRight' && aaDocOpen) { clearInterval(aaCarTimer); aaCarGo(aaCarIdx + 1); aaCarStartTimer(); return; }
+          if (e.key !== 'Escape') return;
+          ['aa-doc-modal', 'aa-demo-modal'].forEach(function (id) {
+            var m = document.getElementById(id);
+            if (m && m.classList.contains('open')) aaCloseModal(id);
+          });
+        });
+      });
+    })();
+    </script>
+
+    <!-- ══ AFRICA FINANCE, Modal Documentation ══ -->
+    <div id="af-doc-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="Documentation Africa Finance WebGIS">
+      <div class="ts-modal ts-doc">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#128176; Africa Finance Observatory &mdash; Documentation</span>
+          <button id="af-doc-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-carousel">
+          <img class="af-carousel-img active" src="PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/Documentation/profil.png" alt="Profil">
+          <img class="af-carousel-img" src="PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/Documentation/Thematic%20indicator.png" alt="Indicateur Th&eacute;matique">
+          <img class="af-carousel-img" src="PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/Documentation/Attribute%20table.png" alt="Table d&rsquo;Attributs">
+          <button class="ts-carousel-btn ts-carousel-prev" onclick="afCarouselPrev()" type="button" aria-label="Photo pr&eacute;c&eacute;dente">&#8249;</button>
+          <button class="ts-carousel-btn ts-carousel-next" onclick="afCarouselNext()" type="button" aria-label="Photo suivante">&#8250;</button>
+          <div class="ts-carousel-counter" id="af-carousel-counter">1 / 3</div>
+          <div class="ts-carousel-dots">
+            <span class="af-dot active" onclick="afCarouselGoto(0)"></span>
+            <span class="af-dot" onclick="afCarouselGoto(1)"></span>
+            <span class="af-dot" onclick="afCarouselGoto(2)"></span>
+          </div>
+          <div class="ts-carousel-caption" id="af-carousel-caption">Profil</div>
+        </div>
+        <div class="ts-modal-body">
+          <div id="af-readme-content" class="ts-readme-content">
+            <div class="ts-readme-loading">Chargement de la documentation&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AFRICA FINANCE, Modal Démonstration ══ -->
+    <div id="af-demo-modal" class="ts-modal-overlay" role="dialog" aria-modal="true" aria-label="D&eacute;monstration Africa Finance WebGIS">
+      <div class="ts-modal ts-demo">
+        <div class="ts-modal-header">
+          <span class="ts-modal-title">&#9654; Africa Finance Observatory &mdash; D&eacute;monstration</span>
+          <button id="af-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div class="ts-video-container">
+          <video id="af-video" controls playsinline>
+            Votre navigateur ne supporte pas la lecture vid&eacute;o.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .af-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.35);
+        cursor: pointer;
+        margin: 0 3px;
+        transition: background 0.2s;
+      }
+      .af-dot.active { background: #38bdf8; }
+    </style>
+
+    <script>
+    /* =====================================================
+       AFRICA FINANCE, Logique interactive (IIFE isolé)
+       ===================================================== */
+    (function () {
+      'use strict';
+
+      var AF_NAMES = ['Profil', 'Indicateur Thématique', 'Table d’Attributs'];
+      var AF_N = AF_NAMES.length;
+
+      /* ─── 1. BANDE MINIATURES ──────────────────────────── */
+      var afThumbIdx = 0, afThumbTimer = null;
+
+      function afSetThumb(idx) {
+        afThumbIdx = ((idx % AF_N) + AF_N) % AF_N;
+        var thumbs = document.querySelectorAll('.af-thumb');
+        thumbs.forEach(function (t, i) { t.classList.toggle('active', i === afThumbIdx); });
+        if (thumbs[afThumbIdx]) {
+          var strip = thumbs[afThumbIdx].parentElement;
+          if (strip) {
+            var t = thumbs[afThumbIdx];
+            strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.clientWidth) / 2, behavior: 'smooth' });
+          }
+        }
+      }
+      window.afSetThumb = afSetThumb;
+
+      window.afNextThumb = function () {
+        clearInterval(afThumbTimer);
+        afSetThumb(afThumbIdx + 1);
+        afThumbTimer = setInterval(function () { afSetThumb(afThumbIdx + 1); }, 3000);
+      };
+      window.afPrevThumb = function () {
+        clearInterval(afThumbTimer);
+        afSetThumb(afThumbIdx - 1);
+        afThumbTimer = setInterval(function () { afSetThumb(afThumbIdx + 1); }, 3000);
+      };
+
+      /* ─── 2. CARROUSEL DOC ──────────────────────────────── */
+      var afCarIdx = 0, afCarTimer = null;
+
+      function afCarUpdate() {
+        document.querySelectorAll('.af-carousel-img').forEach(function (img, i) {
+          img.classList.toggle('active', i === afCarIdx);
+        });
+        document.querySelectorAll('.af-dot').forEach(function (dot, i) {
+          dot.classList.toggle('active', i === afCarIdx);
+        });
+        var cap = document.getElementById('af-carousel-caption');
+        if (cap) cap.textContent = AF_NAMES[afCarIdx];
+        var ctr = document.getElementById('af-carousel-counter');
+        if (ctr) ctr.textContent = (afCarIdx + 1) + ' / ' + AF_N;
+      }
+
+      function afCarGo(idx) {
+        afCarIdx = ((idx % AF_N) + AF_N) % AF_N;
+        afCarUpdate();
+      }
+
+      function afCarStartTimer() {
+        clearInterval(afCarTimer);
+        afCarTimer = setInterval(function () { afCarGo(afCarIdx + 1); }, 3000);
+      }
+
+      window.afCarouselPrev = function () { clearInterval(afCarTimer); afCarGo(afCarIdx - 1); afCarStartTimer(); };
+      window.afCarouselNext = function () { clearInterval(afCarTimer); afCarGo(afCarIdx + 1); afCarStartTimer(); };
+      window.afCarouselGoto = function (i) { clearInterval(afCarTimer); afCarGo(i); afCarStartTimer(); };
+
+      /* ─── 3. CHARGEMENT README ──────────────────────────── */
+      var afReadmeLoaded = false;
+
+      function afLoadReadme() {
+        var el = document.getElementById('af-readme-content');
+        if (!el || afReadmeLoaded) return;
+        var url = 'https://raw.githubusercontent.com/abdousamad387/WEBGIS_AFRICA_FINANCE/main/README.md';
+        fetch(url)
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+          .then(function (md) {
+            if (window.marked) {
+              el.innerHTML = window.marked.parse(md);
+            } else {
+              el.innerHTML = '<pre style="white-space:pre-wrap;color:#c4c4d4;font-size:12px;padding:16px">'
+                + md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+            }
+            afReadmeLoaded = true;
+          })
+          .catch(function (err) {
+            if (el) el.innerHTML = '<div style="padding:32px;text-align:center;color:#ef4444">Impossible de charger README.md (' + err.message + ')</div>';
+          });
+      }
+
+      /* ─── 4. CONTRÔLE MODAUX ───────────────────────────── */
+      function afOpenModal(id) {
+        var m = document.getElementById(id);
+        if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      }
+
+      function afCloseModal(id) {
+        var m = document.getElementById(id);
+        if (!m) return;
+        m.classList.remove('open');
+        document.body.style.overflow = '';
+        if (id === 'af-demo-modal') {
+          var v = document.getElementById('af-video');
+          if (v) { v.pause(); v.currentTime = 0; }
+        }
+        if (id === 'af-doc-modal') clearInterval(afCarTimer);
+      }
+
+      window.afOpenDocModal = function () {
+        afCarIdx = 0; afCarUpdate();
+        afOpenModal('af-doc-modal');
+        afLoadReadme();
+        afCarStartTimer();
+      };
+
+      window.afOpenDemoModal = function () {
+        var v = document.getElementById('af-video');
+        if (v && !v.getAttribute('data-loaded')) {
+          var file = 'Africa Finance Observatory - WebGIS et 34 pages de plus - Profil 1 – Microsoft​ Edge 2026-04-13 23-11-44.mp4';
+          v.src = 'PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/video%20demo/' + encodeURIComponent(file);
+          v.setAttribute('data-loaded', '1');
+        }
+        afOpenModal('af-demo-modal');
+      };
+
+      /* ─── 5. INIT ───────────────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', function () {
+        afThumbTimer = setInterval(function () { afSetThumb(afThumbIdx + 1); }, 3000);
+
+        var docClose = document.getElementById('af-doc-close');
+        var demoClose = document.getElementById('af-demo-close');
+        if (docClose) docClose.addEventListener('click', function () { afCloseModal('af-doc-modal'); });
+        if (demoClose) demoClose.addEventListener('click', function () { afCloseModal('af-demo-modal'); });
+
+        ['af-doc-modal', 'af-demo-modal'].forEach(function (id) {
+          var m = document.getElementById(id);
+          if (m) m.addEventListener('click', function (e) { if (e.target === m) afCloseModal(id); });
+        });
+
+        /* Touche Échap + flèches */
+        document.addEventListener('keydown', function (e) {
+          var afDocOpen = document.getElementById('af-doc-modal') && document.getElementById('af-doc-modal').classList.contains('open');
+          if (e.key === 'ArrowLeft'  && afDocOpen) { clearInterval(afCarTimer); afCarGo(afCarIdx - 1); afCarStartTimer(); return; }
+          if (e.key === 'ArrowRight' && afDocOpen) { clearInterval(afCarTimer); afCarGo(afCarIdx + 1); afCarStartTimer(); return; }
+          if (e.key !== 'Escape') return;
+          ['af-doc-modal', 'af-demo-modal'].forEach(function (id) {
+            var m = document.getElementById(id);
+            if (m && m.classList.contains('open')) afCloseModal(id);
+          });
+        });
+      });
+    })();
+    </script>
+    <script src="assets/js/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+
+# Fichiers volumineux exclus de git
+*.mp4
+*.MP4
+*.avi
+*.mov
