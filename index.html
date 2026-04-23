@@ -203,7 +203,8 @@
       padding: 24px; display: flex; align-items: center;
       justify-content: center; background: #000;
     }
-    .ts-video-container video {
+    .ts-video-container video,
+    .ts-video-container iframe {
       width: 100%; max-height: calc(88vh - 80px);
       border-radius: 12px; outline: none;
     }
@@ -1963,9 +1964,7 @@
           <button id="ts-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
         </div>
         <div class="ts-video-container">
-          <video id="ts-video" controls playsinline>
-            Votre navigateur ne supporte pas la lecture vid&eacute;o.
-          </video>
+          <iframe id="ts-video" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -2078,7 +2077,7 @@
         document.body.style.overflow = '';
         if (id === 'ts-demo-modal') {
           var v = document.getElementById('ts-video');
-          if (v) { v.pause(); v.currentTime = 0; }
+          if (v) { v.src = ''; }
         }
         if (id === 'ts-doc-modal') clearInterval(tsCarTimer);
       }
@@ -2092,11 +2091,7 @@
 
       window.tsOpenDemoModal = function () {
         var v = document.getElementById('ts-video');
-        if (v && !v.getAttribute('data-loaded')) {
-          var file = 'TERRASIGHT et 38 pages de plus - Profil 1 \u2013 Microsoft\u200b Edge 2026-04-15 01-12-58.mp4';
-          v.src = 'PROJETS/Data%20Science%20%26%20Geospatial/Terrasight(GEE)/video%20demo/' + encodeURIComponent(file);
-          v.setAttribute('data-loaded', '1');
-        }
+        if (v) { v.src = 'https://drive.google.com/file/d/1DV_6sof20TcCJDc06WttvNEYTKtX3FEp/preview'; }
         tsOpenModal('ts-demo-modal');
       };
 
@@ -2171,9 +2166,7 @@
           <button id="as-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
         </div>
         <div class="ts-video-container">
-          <video id="as-video" controls playsinline>
-            Votre navigateur ne supporte pas la lecture vid&eacute;o.
-          </video>
+          <iframe id="as-video" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -2299,7 +2292,7 @@
         document.body.style.overflow = '';
         if (id === 'as-demo-modal') {
           var v = document.getElementById('as-video');
-          if (v) { v.pause(); v.currentTime = 0; }
+          if (v) { v.src = ''; }
         }
         if (id === 'as-doc-modal') clearInterval(asCarTimer);
       }
@@ -2313,10 +2306,7 @@
 
       window.asOpenDemoModal = function () {
         var v = document.getElementById('as-video');
-        if (v && !v.getAttribute('data-loaded')) {
-          v.src = 'PROJETS/WebGIS%20Tools/AIRSEN/video%20demo.mp4';
-          v.setAttribute('data-loaded', '1');
-        }
+        if (v) { v.src = 'https://drive.google.com/file/d/1o-g6QUVww_mwSJd1PmSIoSad84mxrR32/preview'; }
         asOpenModal('as-demo-modal');
       };
 
@@ -2404,9 +2394,7 @@
           <button id="cv-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
         </div>
         <div class="ts-video-container">
-          <video id="cv-video" controls playsinline>
-            Votre navigateur ne supporte pas la lecture vid&eacute;o.
-          </video>
+          <iframe id="cv-video" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -2538,7 +2526,7 @@
         document.body.style.overflow = '';
         if (id === 'cv-demo-modal') {
           var v = document.getElementById('cv-video');
-          if (v) { v.pause(); v.currentTime = 0; }
+          if (v) { v.src = ''; }
         }
         if (id === 'cv-doc-modal') clearInterval(cvCarTimer);
       }
@@ -2552,11 +2540,7 @@
 
       window.cvOpenDemoModal = function () {
         var v = document.getElementById('cv-video');
-        if (v && !v.getAttribute('data-loaded')) {
-          var file = 'COVID-19 Africa, Epidemiological Dashboard _ Abdou Samad Faye et 36 pages de plus - Profil 1 – Microsoft​ Edge 2026-04-14 23-04-13.mp4';
-          v.src = 'PROJETS/Data%20Analyst/COVID_19/Video%20demo/' + encodeURIComponent(file);
-          v.setAttribute('data-loaded', '1');
-        }
+        if (v) { v.src = 'https://drive.google.com/file/d/1QqZ3OeEvYDEokkGIRgod0f1vFDXsW2Ex/preview'; }
         cvOpenModal('cv-demo-modal');
       };
 
@@ -2632,9 +2616,7 @@
           <button id="aa-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
         </div>
         <div class="ts-video-container">
-          <video id="aa-video" controls playsinline>
-            Votre navigateur ne supporte pas la lecture vid&eacute;o.
-          </video>
+          <iframe id="aa-video" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -2756,7 +2738,7 @@
         document.body.style.overflow = '';
         if (id === 'aa-demo-modal') {
           var v = document.getElementById('aa-video');
-          if (v) { v.pause(); v.currentTime = 0; }
+          if (v) { v.src = ''; }
         }
         if (id === 'aa-doc-modal') clearInterval(aaCarTimer);
       }
@@ -2770,11 +2752,7 @@
 
       window.aaOpenDemoModal = function () {
         var v = document.getElementById('aa-video');
-        if (v && !v.getAttribute('data-loaded')) {
-          var file = 'Africa Agri Dashboard _ 2000-2024 et 36 pages de plus - Profil 1 – Microsoft​ Edge 2026-04-14 23-41-51.mp4';
-          v.src = 'PROJETS/Data%20Analyst/AGRI_Africa/video%20demo/' + encodeURIComponent(file);
-          v.setAttribute('data-loaded', '1');
-        }
+        if (v) { v.src = 'https://drive.google.com/file/d/1kwiu2vFQiDayNC_EotLk8fGpM1Zh0HeB/preview'; }
         aaOpenModal('aa-demo-modal');
       };
 
@@ -2844,9 +2822,7 @@
           <button id="af-demo-close" class="ts-modal-close" aria-label="Fermer">&#10005;</button>
         </div>
         <div class="ts-video-container">
-          <video id="af-video" controls playsinline>
-            Votre navigateur ne supporte pas la lecture vid&eacute;o.
-          </video>
+          <iframe id="af-video" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -2968,7 +2944,7 @@
         document.body.style.overflow = '';
         if (id === 'af-demo-modal') {
           var v = document.getElementById('af-video');
-          if (v) { v.pause(); v.currentTime = 0; }
+          if (v) { v.src = ''; }
         }
         if (id === 'af-doc-modal') clearInterval(afCarTimer);
       }
@@ -2982,11 +2958,7 @@
 
       window.afOpenDemoModal = function () {
         var v = document.getElementById('af-video');
-        if (v && !v.getAttribute('data-loaded')) {
-          var file = 'Africa Finance Observatory - WebGIS et 34 pages de plus - Profil 1 – Microsoft​ Edge 2026-04-13 23-11-44.mp4';
-          v.src = 'PROJETS/WebGIS%20Tools/Africa%20finance%20webgis/video%20demo/' + encodeURIComponent(file);
-          v.setAttribute('data-loaded', '1');
-        }
+        if (v) { v.src = 'https://drive.google.com/file/d/1zPjWfJyS0kk0MQa9_pixCUd-CRzwzWnb/preview'; }
         afOpenModal('af-demo-modal');
       };
 
