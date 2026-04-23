@@ -79,8 +79,8 @@
     /* ── Conteneur modal ── */
     .ts-modal {
       background: #0d0d1a; border: 1px solid rgba(74,222,128,.18);
-      border-radius: 20px; width: 80vw; max-width: 80vw;
-      max-height: 88vh; overflow: hidden; display: flex;
+      border-radius: 20px; width: 95vw; max-width: 95vw;
+      max-height: 92vh; overflow: hidden; display: flex;
       flex-direction: column;
       transform: scale(.94) translateY(24px);
       transition: transform .35s cubic-bezier(.34,1.2,.64,1);
@@ -200,13 +200,14 @@
 
     /* ── Vidéo ── */
     .ts-video-container {
-      padding: 24px; display: flex; align-items: center;
+      padding: 0; display: flex; align-items: stretch;
       justify-content: center; background: #000;
+      flex: 1;
     }
     .ts-video-container video,
     .ts-video-container iframe {
-      width: 100%; max-height: calc(88vh - 80px);
-      border-radius: 12px; outline: none;
+      width: 100%; height: calc(92vh - 70px);
+      border-radius: 0; outline: none; border: none;
     }
     </style>
 </head>
